@@ -1,7 +1,7 @@
 package com.vibbix.ballroom;
 
 import android.app.Activity;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.Editable;
@@ -19,12 +19,16 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 
+
 public class MAIN extends Activity {
     public double balls;
     public double cost;
     public int efficiency;
     public boolean isMetric;
     public boolean EasyMode;
+    BigDecimal cubcmpercubm = BigDecimal.valueOf(Math.pow(10, 6));
+    BigDecimal cubinpercubft = BigDecimal.valueOf(1728D);
+
     //views
     EditText etArea;
     EditText etDepth;
@@ -207,9 +211,10 @@ public class MAIN extends Activity {
                    Double money = Double.parseDouble(strmoney);
                    if(area > 0D && depth >0 && radius >0 && money >0){
                        if (isMetric){
-                           MetricEstimate(efficiency, area, depth, radius, money);
+                           //MetricEstimate(efficiency, area, depth, radius, money);
+                           EstimateBalls(efficiency, area, depth, radius, money,cubcmpercubm);
                        } else {
-                           ImperialEstimate(efficiency, area, depth, radius, money);
+                           EstimateBalls(efficiency, area, depth, radius, money,cubinpercubft);
                        }
 
                        Resources res = getResources();
@@ -236,32 +241,30 @@ public class MAIN extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            Intent intentabout = new Intent(this, activity_about.class);
+            startActivity(intentabout);
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void ImperialEstimate(double efficiency, double footage, double depth, double radius,
-                               double price)
-    {
-        double cubinpercubft = 1728D;
-        efficiency = efficiency/100;
-        double wholevolume = footage*depth;
-        double usablevolume = wholevolume * efficiency;
-        double ballvolume = 4/3 * Math.PI * Math.pow(radius, 3) / cubinpercubft;
-        this.balls = Math.floor(usablevolume/ballvolume);
-        this.cost = Math.ceil(balls*price*100)/100;
-    }
 
-    public void MetricEstimate(double efficiency, double footage, double depth, double radius,
-                               double price)
+    public void EstimateBalls(double efficiency, double footage, double depth, double radius,
+                         double price, BigDecimal measurementscale)
     {
-        double cubcmpercubm = Math.pow(10, 6);
+        //BigDecimal cubcmpercubm = BigDecimal.valueOf(Math.pow(10, 6));
         efficiency = efficiency/100;
-        double wholevolume = footage*depth;
-        double usablevolume = wholevolume * efficiency;
-        double ballvolume = 4/3 * Math.PI * Math.pow(radius, 3) / 1 / cubcmpercubm;
-        this.balls = Math.floor(usablevolume/ballvolume);
+        BigDecimal wholevolume = BigDecimal.valueOf(footage*depth);
+        BigDecimal usablevolume =wholevolume.multiply(BigDecimal.valueOf(efficiency));
+//        BigDecimal ballvolume = BigDecimal.valueOf(4/3 * Math.PI * Math.pow(radius, 3) / 1
+//                / cubcmpercubm);
+        BigDecimal ballvolume = BigDecimal.valueOf(4).divide(BigDecimal.valueOf(3),10,
+                RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(Math.PI)).multiply(
+                BigDecimal.valueOf(Math.pow(radius,3))).divide(BigDecimal.valueOf(1),10,
+                RoundingMode.HALF_UP).divide
+                (measurementscale,10,RoundingMode.HALF_UP);
+        this.balls = usablevolume.divide(ballvolume,10,RoundingMode.HALF_UP).doubleValue();
+        //this.balls = Math.floor(usablevolume/ballvolume);
         this.cost = Math.ceil(balls*price*100)/100;
     }
 }
