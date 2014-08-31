@@ -1,0 +1,209 @@
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/llSwitch">
+
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/Metric"
+            android:id="@+id/switchMetric"
+            android:layout_gravity="center"
+            android:layout_margin="4dp" />
+
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/EasyMode"
+            android:id="@+id/switchEasy"
+            android:layout_margin="4dp"
+            android:layout_gravity="center"
+            android:checked="false" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/llEfficiency">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/BallEfficiency"
+            android:id="@+id/txtEfficiency"
+            android:layout_gravity="center"
+            android:layout_margin="4dp" />
+
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/seekEfficiency"
+            android:layout_margin="4dp"
+            android:progress="64" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/txtEfficiencyPercent"
+            android:layout_gravity="center_horizontal"
+            android:text="64%"
+            android:layout_margin="4dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:focusableInTouchMode="false"
+        android:id="@+id/llArea">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/BallArea"
+            android:id="@+id/txtconstArea"
+            android:singleLine="false"
+            android:layout_margin="4dp" />
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:ems="10"
+            android:id="@+id/decimalArea"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:maxLength="10"
+            android:text="674" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/FeetSquared"
+            android:id="@+id/txtunitSquared"
+            android:layout_margin="4dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/llDepth">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/BallDepth"
+            android:id="@+id/txtconstDepth"
+            android:layout_margin="4dp" />
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:ems="10"
+            android:id="@+id/decimalDepth"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="2"
+            android:maxLength="10" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/Feet"
+            android:id="@+id/txtunitstd"
+            android:layout_margin="4dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/llRadius">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/BallRadius"
+            android:id="@+id/txtconstRadius"
+            android:layout_margin="4dp" />
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:ems="10"
+            android:id="@+id/decimalRadius"
+            android:layout_weight="1"
+            android:maxLength="10"
+            android:text="1.675"
+            android:layout_margin="4dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/Inchs"
+            android:id="@+id/txtunitsmall"
+            android:layout_margin="4dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/llMoney">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/BallPrice"
+            android:id="@+id/txtconstMoney"
+            android:layout_gravity="center"
+            android:layout_margin="4dp" />
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:ems="10"
+            android:id="@+id/decimalMoney"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:layout_gravity="center"
+            android:text=".20"
+            android:maxLength="10" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/muricadollars"
+            android:id="@+id/txtunitmoney"
+            android:layout_margin="4dp"
+            android:layout_gravity="center" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/txtResult"
+        android:layout_gravity="center_horizontal" />
+
+</LinearLayout>
