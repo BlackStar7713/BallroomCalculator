@@ -3,17 +3,8 @@ buildscript {
         maven { url 'https://maven.fabric.io/public' }
     }
 
-    dependencies {
-        classpath 'io.fabric.tools:gradle:1.+'
-    }
 }
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
-
-repositories {
-    maven { url 'https://maven.fabric.io/public' }
-}
-
 
 android {
     compileSdkVersion 25
@@ -37,6 +28,8 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile "com.android.support:support-core-utils:25.1.1"
+    compile "com.android.support:appcompat-v7:25.1.1"
     /*compile files('libs/google-api-services-analytics-v3-rev99-1.19.0.jar')
     compile('com.crashlytics.sdk.android:crashlytics:2.2.0@aar') {
         transitive = true;
