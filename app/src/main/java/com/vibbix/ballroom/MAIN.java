@@ -18,6 +18,9 @@ import android.widget.TextView;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+//import com.crashlytics.android.Crashlytics;
+//import io.fabric.sdk.android.Fabric;
+
 
 
 public class MAIN extends Activity {
@@ -34,9 +37,19 @@ public class MAIN extends Activity {
     EditText etDepth;
     EditText etRadius;
     EditText etMoney;
+
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Fabric.with(this, new Crashlytics());
         this.isMetric = false;
         this.balls = 0.0D;
         this.cost = 0.0D;
@@ -130,6 +143,7 @@ public class MAIN extends Activity {
         });
         //
     }
+
     private void MetricCheck()
     {
         Switch swmetric = (Switch)findViewById(R.id.switchMetric);
@@ -184,14 +198,6 @@ public class MAIN extends Activity {
             llEfficiency.setVisibility(View.VISIBLE);
             EasyMode = false;
         }
-    }
-
-    public static double round(double value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
-
-        BigDecimal bd = new BigDecimal(value);
-        bd = bd.setScale(places, RoundingMode.HALF_UP);
-        return bd.doubleValue();
     }
 
     private void SetCount()

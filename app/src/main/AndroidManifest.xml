@@ -30,6 +30,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vibbix.ballroom.about" />
         </activity>
+
+        <meta-data
+            android:name="com.crashlytics.ApiKey"
+            android:value="31c77287ae8e489fd323d3db8b12e51a7aa5f361" />
     </application>
 
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

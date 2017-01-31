@@ -11,12 +11,12 @@ public final class R {
     public static final class attr {
     }
     public static final class bool {
-        public static final int ga_autoActivityTracking=0x7f040000;
-        public static final int ga_reportUncaughtExceptions=0x7f040001;
+        public static final int ga_autoActivityTracking=0x7f050000;
+        public static final int ga_reportUncaughtExceptions=0x7f050001;
     }
     public static final class dimen {
-        public static final int activity_horizontal_margin=0x7f050000;
-        public static final int activity_vertical_margin=0x7f050001;
+        public static final int activity_horizontal_margin=0x7f040000;
+        public static final int activity_vertical_margin=0x7f040001;
     }
     public static final class drawable {
         public static final int ic_launcher=0x7f020000;
@@ -76,14 +76,15 @@ public final class R {
         public static final int action_settings=0x7f06000e;
         public static final int app_name=0x7f06000f;
         public static final int centimeter=0x7f060010;
-        public static final int formatedresult=0x7f060011;
-        public static final int ga_trackingId=0x7f060012;
-        public static final int muricadollars=0x7f060013;
-        public static final int part1=0x7f060014;
-        public static final int part2=0x7f060015;
-        public static final int part3=0x7f060016;
-        public static final int thanks=0x7f060017;
-        public static final int title_activity_about=0x7f060018;
+        public static final int com_crashlytics_android_build_id=0x7f060011;
+        public static final int formatedresult=0x7f060012;
+        public static final int ga_trackingId=0x7f060013;
+        public static final int muricadollars=0x7f060014;
+        public static final int part1=0x7f060015;
+        public static final int part2=0x7f060016;
+        public static final int part3=0x7f060017;
+        public static final int thanks=0x7f060018;
+        public static final int title_activity_about=0x7f060019;
     }
     public static final class style {
         /**  Customize your theme here. 
