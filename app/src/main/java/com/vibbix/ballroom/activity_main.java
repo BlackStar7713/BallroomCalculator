@@ -7,11 +7,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import com.transitionseverywhere.TransitionManager;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -64,6 +67,8 @@ public class activity_main extends AppCompatActivity {
     String percentFormatter;
     @BindString(R.string.formattedresult)
     String formattedResult;
+    @BindView(R.id.transition_container)
+    ViewGroup transition_container;
     //endregion
     private BallroomCalc ballroomCalc;
     private boolean wasMetric = false;
@@ -187,6 +192,7 @@ public class activity_main extends AppCompatActivity {
      */
     public void updateEstimate() {
         if (wasEasy != this.ballroomCalc.isEasyMode()) {
+            TransitionManager.beginDelayedTransition(transition_container);
             if (this.ballroomCalc.isEasyMode()) {
                 llRadius.setVisibility(View.GONE);
                 llEfficiency.setVisibility(View.GONE);
@@ -210,7 +216,7 @@ public class activity_main extends AppCompatActivity {
         }
         try {
             finaltext.setText(String.format(this.formattedResult,
-                    round(this.ballroomCalc.getBalls(), 2), this.currency,
+                    this.ballroomCalc.getBalls(), this.currency,
                     round(this.ballroomCalc.getCost(), 2)));
         } catch (Exception ex) {
             ex.printStackTrace();
