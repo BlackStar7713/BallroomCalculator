@@ -23,13 +23,6 @@ import butterknife.OnClick;
 import butterknife.OnTextChanged;
 
 public class activity_main extends AppCompatActivity {
-    private static final BigDecimal cubcmpercubm = BigDecimal.valueOf(Math.pow(10, 6));
-    private static final BigDecimal cubinpercubft = BigDecimal.valueOf(1728D);
-    //Keplar conjecture
-    private static final BigDecimal maxdensity = BigDecimal.valueOf(Math.PI)
-            .divide(BigDecimal.valueOf(3.0D)
-                    .multiply(BigDecimal.valueOf(Math.sqrt(2.0D))), BigDecimal.ROUND_HALF_EVEN)
-            .multiply(BigDecimal.valueOf(100.0D));
     //region views
     @BindView(R.id.decimalArea)
     EditText etArea;
@@ -107,7 +100,6 @@ public class activity_main extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
-        skpacking.setMax(maxdensity.intValue());
     }
 
     @OnClick(R.id.switchMetric)
@@ -184,9 +176,11 @@ public class activity_main extends AppCompatActivity {
                 if (area > 0D && depth > 0 && radius > 0 && money > 0) {
                     if (isMetric) {
                         //MetricEstimate(efficiency, area, depth, radius, money);
-                        EstimateBalls(efficiency, area, depth, radius, money, cubcmpercubm);
+                        this.balls = BallroomCalc.estimateBalls(efficiency, area, depth, radius,
+                                money, BallroomCalc.cubcmpercubm);
                     } else {
-                        EstimateBalls(efficiency, area, depth, radius, money, cubinpercubft);
+                        this.balls = BallroomCalc.estimateBalls(efficiency, area, depth, radius,
+                                money, BallroomCalc.cubinpercubft);
                     }
                     Resources res = getResources();
                     textresult = String.format(res.getString(R.string.formatedresult),
@@ -226,27 +220,4 @@ public class activity_main extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void EstimateBalls(double efficiency, double footage, double depth, double radius,
-                               double price, BigDecimal measurementscale)
-    {
-        try {
-            efficiency = efficiency / 100;
-            BigDecimal wholevolume = BigDecimal.valueOf(footage * depth);
-            BigDecimal usablevolume = wholevolume.multiply(BigDecimal.valueOf(efficiency));
-            BigDecimal ballvolume = BigDecimal.valueOf(4).divide(BigDecimal.valueOf(3), 10,
-                    RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(Math.PI)).multiply(
-                    BigDecimal.valueOf(Math.pow(radius, 3))).divide(BigDecimal.valueOf(1), 10,
-                    RoundingMode.HALF_UP).divide
-                    (measurementscale, 10, RoundingMode.HALF_UP);
-            this.balls = usablevolume.divide(ballvolume, 10, RoundingMode.HALF_UP).doubleValue();
-            //this.balls = Math.floor(usablevolume/ballvolume);
-            this.cost = Math.ceil(balls * price * 100) / 100;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-    
-    public double getCost() {
-        return estimateCosts((int) this.balls, this.cost);
-    }
 }
