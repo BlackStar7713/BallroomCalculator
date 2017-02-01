@@ -1,4 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".activity_about" >
+    <item
+        android:id="@+id/action_finn"
+        android:orderInCategory="1"
+        android:title="@string/menu_finn" />
+    <item
+        android:id="@+id/action_berge"
+        android:orderInCategory="2"
+        android:title="@string/menu_berge" />
 </menu>

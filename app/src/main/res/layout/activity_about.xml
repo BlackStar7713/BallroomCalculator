@@ -1,40 +1,51 @@
-<LinearLayout
-    android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/AppTheme"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:orientation="vertical"
+    android:theme="@style/AppTheme">
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
-        android:minHeight="?attr/actionBarSize"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary">
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize">
     </android.support.v7.widget.Toolbar>
 
     <ImageView
-        android:layout_width="248dp"
-        android:layout_height="wrap_content"
         android:id="@+id/imageView"
+        android:layout_width="248dp"
+        android:layout_height="0dp"
         android:layout_gravity="center_horizontal"
-        android:src="@drawable/ic_launcher"
-        android:layout_weight="2.08" />
+        android:layout_weight="2.08"
+        android:src="@drawable/ic_launcher" />
 
     <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/thanks"
-        android:id="@+id/textView"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="10dp" />
+        android:layout_margin="10dp"
+        android:text="@string/thanks"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
     <TextView
         android:id="@+id/versionnumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10sp"
-        android:layout_marginStart="10sp"
+        android:layout_gravity="center"
         android:text = "@string/versionstr"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/title_nightmode" />
+
+    <android.support.v7.widget.AppCompatSpinner
+        android:id="@+id/spinner_nightmode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="30sp" />
 
 
 </LinearLayout>

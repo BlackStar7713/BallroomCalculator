@@ -3,7 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".activity_main" >
     <item android:id="@+id/action_settings"
-        android:orderInCategory="100"
+        android:orderInCategory="1"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_github"
+        android:orderInCategory="2"
+        android:title="@string/menu_githublink" />
+    <item
+        android:id="@+id/action_project"
+        android:orderInCategory="3"
+        android:title="@string/menu_projectlink" />
 </menu>

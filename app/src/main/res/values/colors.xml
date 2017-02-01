@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#ffc107</color>
-    <color name="primary_dark">#ffa000</color>
-    <color name="accent">#00bcd4</color>
-    <color name="primary_text">#212121</color>
-    <color name="secondary_text">#757575</color>
+    <!--<color name="primary">#ffc107</color>-->
+    <!--<color name="primary_dark">#ffa000</color>-->
+    <!--<color name="accent">#00bcd4</color>-->
+    <!--<color name="primary_text">#212121</color>-->
+    <!--<color name="secondary_text">#757575</color>-->
+    <color name="colorPrimary">#FFEB3B</color>
+    <color name="colorPrimaryDark">#FBC02D</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="textColorPrimary">#212121</color>
+    <color name="textColorSecondary">#787878</color>
+    <color name="navbarColor">#FBC02D</color>
+    <color name="background">#ffffff</color>
 </resources>
