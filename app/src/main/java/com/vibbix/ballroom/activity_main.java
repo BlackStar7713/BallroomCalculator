@@ -1,13 +1,10 @@
 package com.vibbix.ballroom;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,111 +17,82 @@ import android.widget.TextView;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class activity_main extends AppCompatActivity {
-    public double balls;
-    public double cost;
-    public int efficiency;
-    public boolean isMetric;
-    public boolean EasyMode;
-    BigDecimal cubcmpercubm = BigDecimal.valueOf(Math.pow(10, 6));
-    BigDecimal cubinpercubft = BigDecimal.valueOf(1728D);
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnTextChanged;
 
-    //views
+public class activity_main extends AppCompatActivity {
+    private static final BigDecimal cubcmpercubm = BigDecimal.valueOf(Math.pow(10, 6));
+    private static final BigDecimal cubinpercubft = BigDecimal.valueOf(1728D);
+    //Keplar conjecture
+    private static final BigDecimal maxdensity = BigDecimal.valueOf(Math.PI)
+            .divide(BigDecimal.valueOf(3.0D)
+                    .multiply(BigDecimal.valueOf(Math.sqrt(2.0D))), BigDecimal.ROUND_HALF_EVEN)
+            .multiply(BigDecimal.valueOf(100.0D));
+    //region views
+    @BindView(R.id.decimalArea)
     EditText etArea;
+    @BindView(R.id.decimalDepth)
     EditText etDepth;
+    @BindView(R.id.decimalRadius)
     EditText etRadius;
+    @BindView(R.id.decimalMoney)
     EditText etMoney;
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
+    @BindView(R.id.switchMetric)
+    Switch swmetric;
+    @BindView(R.id.txtResult)
+    TextView finaltext;
+    @BindView(R.id.switchEasy)
+    Switch easyswitch;
+    @BindView(R.id.llEfficiency)
+    LinearLayout llEfficiency;
+    @BindView(R.id.llRadius)
+    LinearLayout llRadius;
+    @BindView(R.id.llSwitch)
+    LinearLayout llswitch;
+    @BindView(R.id.txtunitmoney)
+    TextView money;
+    @BindView(R.id.txtunitsmall)
+    TextView unitsmall;
+    @BindView(R.id.txtunitSquared)
+    TextView unitsquared;
+    @BindView(R.id.txtunitstd)
+    TextView unitstd;
+    @BindView(R.id.seekEfficiency)
+    SeekBar skpacking;
+    private double balls = 0.0D;
+    private double cost = 0.0D;
+    private int efficiency = 65;
+    private boolean isMetric = false;
+    private boolean EasyMode = false;
+
+    private static double estimateCosts(int ballcount, double price) {
+        return Math.ceil(ballcount * price);
+    }
+
     public static double round(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();
-
         BigDecimal bd = new BigDecimal(value);
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();
     }
 
+    //endregion
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-        this.isMetric = false;
-        this.balls = 0.0D;
-        this.cost = 0.0D;
-        this.efficiency = 64;
-        this.EasyMode = false;
-        etArea = (EditText)findViewById(R.id.decimalArea);
-        etArea.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override
-            public void afterTextChanged(Editable s) {
-                SetCount();
-            }
-        });
-        etDepth = (EditText)findViewById(R.id.decimalDepth);
-        etDepth.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override
-            public void afterTextChanged(Editable s) {
-                SetCount();
-            }
-        });
-        etRadius = (EditText)findViewById(R.id.decimalRadius);
-        etRadius.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                SetCount();
-            }
-        });
-        etMoney = (EditText)findViewById(R.id.decimalMoney);
-        etMoney.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override
-            public void afterTextChanged(Editable s) {
-                SetCount();
-            }
-        });
         //fix for linear layout issue
         float density = getResources().getDisplayMetrics().density;
         if (density <= 1.5f){
-            LinearLayout llswitch = (LinearLayout)findViewById(R.id.llSwitch);
             llswitch.setOrientation(LinearLayout.VERTICAL);
         }
-        //metric switch watcher
-        Switch swmetric = (Switch)findViewById(R.id.switchMetric);
-        swmetric.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                MetricCheck();
-                SetCount();
-            }
-        });
-        //easy switch watcher
-        Switch sweasy = (Switch)findViewById(R.id.switchEasy);
-        sweasy.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v) {
-                EasySwitch();
-            }
-        });
         //bar watcher
-        SeekBar skpacking = (SeekBar)findViewById(R.id.seekEfficiency);
         skpacking.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -139,17 +107,22 @@ public class activity_main extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
-        //
+        skpacking.setMax(maxdensity.intValue());
+    }
+
+    @OnClick(R.id.switchMetric)
+    void onMetricSwitch() {
+        this.MetricCheck();
+        this.SetCount();
+    }
+
+    @OnClick(R.id.switchEasy)
+    void onSwitchEasy() {
+        this.EasySwitch();
     }
 
     private void MetricCheck()
     {
-        Switch swmetric = (Switch)findViewById(R.id.switchMetric);
-        TextView money = (TextView)findViewById(R.id.txtunitmoney);
-        TextView unitsmall = (TextView)findViewById(R.id.txtunitsmall);
-        TextView unitsquared = (TextView)findViewById(R.id.txtunitSquared);
-        TextView unitstd = (TextView)findViewById(R.id.txtunitstd);
-        EditText et = (EditText)findViewById(R.id.decimalRadius);
         //is metric
         if (swmetric.isChecked())
         {
@@ -159,7 +132,7 @@ public class activity_main extends AppCompatActivity {
             unitsquared.setText(R.string.MeterSquared);
             unitstd.setText(R.string.Meter);
             if (EasyMode) {
-                et.setText("7.6");
+                etRadius.setText("7.6");
             }
         } else {
             this.isMetric = false;
@@ -168,20 +141,16 @@ public class activity_main extends AppCompatActivity {
             unitsquared.setText(R.string.FeetSquared);
             unitstd.setText(R.string.Feet);
             if (EasyMode) {
-                et.setText("1.675");
+                etRadius.setText("1.675");
             }
         }
     }
 
     private void EasySwitch()
     {
-        Switch easyswitch = (Switch)findViewById(R.id.switchEasy);
-        LinearLayout llEfficiency = (LinearLayout)findViewById(R.id.llEfficiency);
-        LinearLayout llRadius = (LinearLayout)findViewById(R.id.llRadius);
-
         if (easyswitch.isChecked())
         {
-            efficiency = 64;
+            this.efficiency = 64;
             llRadius.setVisibility(View.GONE);
             llEfficiency.setVisibility(View.GONE);
             EditText et = (EditText)findViewById(R.id.decimalRadius);
@@ -200,36 +169,41 @@ public class activity_main extends AppCompatActivity {
 
     private void SetCount()
     {
-           String strarea = etArea.getText().toString();
-           String strdepth = etDepth.getText().toString();
-           String strradius = etRadius.getText().toString();
-           String strmoney = etMoney.getText().toString();
-           String textresult = "";
-           TextView finaltext = (TextView)findViewById(R.id.txtResult);
-           if (strarea != null || strdepth != null || strradius != null || strmoney != null){
-               if (!strarea.isEmpty() && !strdepth.isEmpty() && !strradius.isEmpty()&&
-                       !strmoney.isEmpty()) {
-                   Double area = Double.parseDouble(strarea);
-                   Double depth = Double.parseDouble(strdepth);
-                   Double radius = Double.parseDouble(strradius);
-                   Double money = Double.parseDouble(strmoney);
-                   if(area > 0D && depth >0 && radius >0 && money >0){
-                       if (isMetric){
-                           //MetricEstimate(efficiency, area, depth, radius, money);
-                           EstimateBalls(efficiency, area, depth, radius, money,cubcmpercubm);
-                       } else {
-                           EstimateBalls(efficiency, area, depth, radius, money,cubinpercubft);
-                       }
-
-                       Resources res = getResources();
-                       textresult = String.format(res.getString(R.string.formatedresult),
-                               round(balls,2),round(cost,2));
-                   }
-               }
-           }
-        finaltext.setText(textresult);
+        try {
+            String strarea = etArea.getText().toString();
+            String strdepth = etDepth.getText().toString();
+            String strradius = etRadius.getText().toString();
+            String strmoney = etMoney.getText().toString();
+            String textresult = "";
+            if (!strarea.isEmpty() && !strdepth.isEmpty() && !strradius.isEmpty() &&
+                    !strmoney.isEmpty()) {
+                Double area = Double.parseDouble(strarea);
+                Double depth = Double.parseDouble(strdepth);
+                Double radius = Double.parseDouble(strradius);
+                Double money = Double.parseDouble(strmoney);
+                if (area > 0D && depth > 0 && radius > 0 && money > 0) {
+                    if (isMetric) {
+                        //MetricEstimate(efficiency, area, depth, radius, money);
+                        EstimateBalls(efficiency, area, depth, radius, money, cubcmpercubm);
+                    } else {
+                        EstimateBalls(efficiency, area, depth, radius, money, cubinpercubft);
+                    }
+                    Resources res = getResources();
+                    textresult = String.format(res.getString(R.string.formatedresult),
+                            round(balls, 2), round(cost, 2));
+                }
+            }
+            finaltext.setText(textresult);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
+    @OnTextChanged(value = {R.id.decimalArea, R.id.decimalDepth, R.id.decimalMoney,
+            R.id.decimalRadius}, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    void updateCount() {
+        SetCount();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -252,23 +226,27 @@ public class activity_main extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
-    public void EstimateBalls(double efficiency, double footage, double depth, double radius,
-                         double price, BigDecimal measurementscale)
+    private void EstimateBalls(double efficiency, double footage, double depth, double radius,
+                               double price, BigDecimal measurementscale)
     {
-        //BigDecimal cubcmpercubm = BigDecimal.valueOf(Math.pow(10, 6));
-        efficiency = efficiency/100;
-        BigDecimal wholevolume = BigDecimal.valueOf(footage*depth);
-        BigDecimal usablevolume =wholevolume.multiply(BigDecimal.valueOf(efficiency));
-//        BigDecimal ballvolume = BigDecimal.valueOf(4/3 * Math.PI * Math.pow(radius, 3) / 1
-//                / cubcmpercubm);
-        BigDecimal ballvolume = BigDecimal.valueOf(4).divide(BigDecimal.valueOf(3),10,
-                RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(Math.PI)).multiply(
-                BigDecimal.valueOf(Math.pow(radius,3))).divide(BigDecimal.valueOf(1),10,
-                RoundingMode.HALF_UP).divide
-                (measurementscale,10,RoundingMode.HALF_UP);
-        this.balls = usablevolume.divide(ballvolume,10,RoundingMode.HALF_UP).doubleValue();
-        //this.balls = Math.floor(usablevolume/ballvolume);
-        this.cost = Math.ceil(balls*price*100)/100;
+        try {
+            efficiency = efficiency / 100;
+            BigDecimal wholevolume = BigDecimal.valueOf(footage * depth);
+            BigDecimal usablevolume = wholevolume.multiply(BigDecimal.valueOf(efficiency));
+            BigDecimal ballvolume = BigDecimal.valueOf(4).divide(BigDecimal.valueOf(3), 10,
+                    RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(Math.PI)).multiply(
+                    BigDecimal.valueOf(Math.pow(radius, 3))).divide(BigDecimal.valueOf(1), 10,
+                    RoundingMode.HALF_UP).divide
+                    (measurementscale, 10, RoundingMode.HALF_UP);
+            this.balls = usablevolume.divide(ballvolume, 10, RoundingMode.HALF_UP).doubleValue();
+            //this.balls = Math.floor(usablevolume/ballvolume);
+            this.cost = Math.ceil(balls * price * 100) / 100;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    public double getCost() {
+        return estimateCosts((int) this.balls, this.cost);
     }
 }

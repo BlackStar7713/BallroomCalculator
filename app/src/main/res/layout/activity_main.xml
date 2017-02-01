@@ -1,220 +1,214 @@
-<LinearLayout
-    android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_weight="1"
+    android:orientation="vertical"
     android:weightSum="1">
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
-        android:minHeight="?attr/actionBarSize"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary">
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize">
     </android.support.v7.widget.Toolbar>
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
+        android:id="@+id/llSwitch"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:id="@+id/llSwitch">
-
+        android:orientation="horizontal">
         <Switch
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/Metric"
             android:id="@+id/switchMetric"
-            android:layout_gravity="center"
-            android:layout_margin="4dp" />
-
-        <Switch
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/EasyMode"
-            android:id="@+id/switchEasy"
-            android:layout_margin="4dp"
             android:layout_gravity="center"
-            android:checked="false" />
+            android:layout_margin="4dp"
+            android:text="@string/Metric" />
+
+        <Switch
+            android:id="@+id/switchEasy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="4dp"
+            android:text="@string/EasyMode" />
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/llEfficiency"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/llEfficiency">
+        android:orientation="vertical">
 
         <TextView
+            android:id="@+id/txtEfficiency"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/BallEfficiency"
-            android:id="@+id/txtEfficiency"
             android:layout_gravity="center"
-            android:layout_margin="4dp" />
+            android:layout_margin="4dp"
+            android:text="@string/BallEfficiency"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <SeekBar
+            android:id="@+id/seekEfficiency"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/seekEfficiency"
             android:layout_margin="4dp"
             android:progress="64" />
 
         <TextView
+            android:id="@+id/txtEfficiencyPercent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:id="@+id/txtEfficiencyPercent"
             android:layout_gravity="center_horizontal"
+            android:layout_margin="4dp"
             android:text="64%"
-            android:layout_margin="4dp" />
+            android:textAppearance="?android:attr/textAppearanceLarge" />
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:id="@+id/llArea"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:focusableInTouchMode="false"
-        android:id="@+id/llArea">
+        android:orientation="horizontal">
 
         <TextView
+            android:id="@+id/txtconstArea"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/BallArea"
-            android:id="@+id/txtconstArea"
-            android:singleLine="false"
-            android:layout_margin="4dp" />
+            android:layout_margin="4dp"
+            android:text="@string/BallArea" />
 
         <EditText
+            android:id="@+id/decimalArea"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:ems="10"
-            android:id="@+id/decimalArea"
-            android:layout_weight="1"
             android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:ems="10"
+            android:inputType="numberDecimal"
             android:maxLength="10"
             android:text="674" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/FeetSquared"
             android:id="@+id/txtunitSquared"
-            android:layout_margin="4dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:id="@+id/llDepth">
-
-        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/BallDepth"
-            android:id="@+id/txtconstDepth"
-            android:layout_margin="4dp" />
-
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:ems="10"
-            android:id="@+id/decimalDepth"
-            android:layout_weight="1"
             android:layout_margin="4dp"
-            android:text="2"
-            android:maxLength="10" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/Feet"
-            android:id="@+id/txtunitstd"
-            android:layout_margin="4dp" />
+            android:text="@string/FeetSquared" />
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:id="@+id/llDepth"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:id="@+id/llRadius">
+        android:orientation="horizontal">
 
         <TextView
+            android:id="@+id/txtconstDepth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/BallRadius"
-            android:id="@+id/txtconstRadius"
-            android:layout_margin="4dp" />
+            android:layout_margin="4dp"
+            android:text="@string/BallDepth" />
 
         <EditText
+            android:id="@+id/decimalDepth"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:ems="10"
-            android:id="@+id/decimalRadius"
+            android:layout_margin="4dp"
             android:layout_weight="1"
+            android:ems="10"
+            android:inputType="numberDecimal"
             android:maxLength="10"
-            android:text="1.675"
-            android:layout_margin="4dp" />
+            android:text="2" />
 
         <TextView
+            android:id="@+id/txtunitstd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/Inchs"
+            android:layout_margin="4dp"
+            android:text="@string/Feet" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llRadius"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/txtconstRadius"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:text="@string/BallRadius" />
+
+        <EditText
+            android:id="@+id/decimalRadius"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:ems="10"
+            android:inputType="numberDecimal"
+            android:maxLength="10"
+            android:text="1.675" />
+
+        <TextView
             android:id="@+id/txtunitsmall"
-            android:layout_margin="4dp" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:text="@string/Inchs" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:id="@+id/llMoney"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:id="@+id/llMoney">
+        android:orientation="horizontal">
 
         <TextView
+            android:id="@+id/txtconstMoney"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/BallPrice"
-            android:id="@+id/txtconstMoney"
             android:layout_gravity="center"
-            android:layout_margin="4dp" />
+            android:layout_margin="4dp"
+            android:text="@string/BallPrice" />
 
         <EditText
+            android:id="@+id/decimalMoney"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:ems="10"
-            android:id="@+id/decimalMoney"
-            android:layout_weight="1"
-            android:layout_margin="4dp"
             android:layout_gravity="center"
-            android:text=".20"
-            android:maxLength="10" />
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:ems="10"
+            android:inputType="numberDecimal"
+            android:maxLength="10"
+            android:text=".20" />
 
         <TextView
+            android:id="@+id/txtunitmoney"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/muricadollars"
-            android:id="@+id/txtunitmoney"
+            android:layout_gravity="center"
             android:layout_margin="4dp"
-            android:layout_gravity="center" />
+            android:text="@string/muricadollars" />
     </LinearLayout>
 
     <TextView
+        android:id="@+id/txtResult"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/txtResult"
-        android:layout_gravity="center_horizontal" />
-
-
-
+        android:layout_gravity="center_horizontal"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </LinearLayout>

@@ -30,6 +30,8 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile "com.android.support:support-core-utils:25.1.1"
     compile "com.android.support:appcompat-v7:25.1.1"
+    compile 'com.jakewharton:butterknife:8.5.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
     /*compile files('libs/google-api-services-analytics-v3-rev99-1.19.0.jar')
     compile('com.crashlytics.sdk.android:crashlytics:2.2.0@aar') {
         transitive = true;
