@@ -1,7 +1,6 @@
 package com.vibbix.ballroom;
 
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,14 +15,17 @@ import android.widget.TextView;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Currency;
+import java.util.Locale;
 
+import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 
 public class activity_main extends AppCompatActivity {
-    //region views
+    //region binded fields
     @BindView(R.id.decimalArea)
     EditText etArea;
     @BindView(R.id.decimalDepth)
@@ -56,16 +58,25 @@ public class activity_main extends AppCompatActivity {
     TextView unitstd;
     @BindView(R.id.seekEfficiency)
     SeekBar skpacking;
-    private double balls = 0.0D;
-    private double cost = 0.0D;
-    private int efficiency = 65;
-    private boolean isMetric = false;
-    private boolean EasyMode = false;
+    @BindView(R.id.txtEfficiencyPercent)
+    TextView tvPercent;
+    @BindString(R.string.percentFormatter)
+    String percentFormatter;
+    @BindString(R.string.formattedresult)
+    String formattedResult;
+    //endregion
+    private BallroomCalc ballroomCalc;
+    private boolean wasMetric = false;
+    private boolean wasEasy = false;
+    private String currency;
 
-    private static double estimateCosts(int ballcount, double price) {
-        return Math.ceil(ballcount * price);
-    }
-
+    /**
+     * Rounds a number to a certain amount of decimal points
+     *
+     * @param value  The double value
+     * @param places Number of place
+     * @return Rounded number
+     */
     public static double round(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();
         BigDecimal bd = new BigDecimal(value);
@@ -73,130 +84,138 @@ public class activity_main extends AppCompatActivity {
         return bd.doubleValue();
     }
 
-    //endregion
+    /**
+     * Parses a string as a double
+     *
+     * @param d input string
+     * @return a verified double
+     */
+    public static double inputValidator(String d) {
+        try {
+            return Double.valueOf(d.isEmpty() ? "0.0" : d);
+        } catch (Exception ex) {
+            return 0.0D;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
+        this.ballroomCalc = new BallroomCalc();
+        try {
+            this.currency = Currency.getInstance(Locale.getDefault()).getSymbol();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            this.currency = "$";
+        }
         //fix for linear layout issue
         float density = getResources().getDisplayMetrics().density;
         if (density <= 1.5f){
             llswitch.setOrientation(LinearLayout.VERTICAL);
         }
-        //bar watcher
+        //seekbar watcher
         skpacking.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                TextView tvPercent = (TextView)findViewById(R.id.txtEfficiencyPercent);
-                String z = Integer.toString(progress) + "%";
-                tvPercent.setText(z);
-                efficiency = progress;
-                SetCount();
+                tvPercent.setText(String.format(percentFormatter, Integer.toString(progress)));
+                ballroomCalc.setEfficiency(progress);
+                updateEstimate();
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
+        updateArea();
+        updateDepth();
+        updateMoney();
+        updateRadius();
+        skpacking.setMax(BallroomCalc.maxdensity.intValue());
+        skpacking.setProgress(skpacking.getProgress());
     }
 
     @OnClick(R.id.switchMetric)
     void onMetricSwitch() {
-        this.MetricCheck();
-        this.SetCount();
+        this.ballroomCalc.setIsMetric(swmetric.isChecked());
+        this.updateEstimate();
     }
 
     @OnClick(R.id.switchEasy)
     void onSwitchEasy() {
-        this.EasySwitch();
+        this.ballroomCalc.setEasymode(easyswitch.isChecked());
+        this.updateEstimate();
     }
 
-    private void MetricCheck()
-    {
-        //is metric
-        if (swmetric.isChecked())
-        {
-            this.isMetric = true;
-            money.setText(R.string.CommieCash);
-            unitsmall.setText(R.string.centimeter);
-            unitsquared.setText(R.string.MeterSquared);
-            unitstd.setText(R.string.Meter);
-            if (EasyMode) {
-                etRadius.setText("7.6");
-            }
-        } else {
-            this.isMetric = false;
-            money.setText(R.string.muricadollars);
-            unitsmall.setText(R.string.Inchs);
-            unitsquared.setText(R.string.FeetSquared);
-            unitstd.setText(R.string.Feet);
-            if (EasyMode) {
-                etRadius.setText("1.675");
-            }
-        }
+    @OnTextChanged(value = R.id.decimalArea, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    void updateArea() {
+        String area = etArea.getText().toString();
+        double areaval = inputValidator(area);
+        this.ballroomCalc.setArea(areaval);
+        this.updateEstimate();
     }
 
-    private void EasySwitch()
-    {
-        if (easyswitch.isChecked())
-        {
-            this.efficiency = 64;
-            llRadius.setVisibility(View.GONE);
-            llEfficiency.setVisibility(View.GONE);
-            EditText et = (EditText)findViewById(R.id.decimalRadius);
-            if (isMetric){
-                et.setText("7.6");
+    @OnTextChanged(value = R.id.decimalMoney, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    void updateMoney() {
+        String money = etMoney.getText().toString();
+        double moneyval = inputValidator(money);
+        this.ballroomCalc.setPrice(moneyval);
+        this.updateEstimate();
+    }
+
+    @OnTextChanged(value = R.id.decimalDepth, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    void updateDepth() {
+        String depth = etDepth.getText().toString();
+        double depthval = inputValidator(depth);
+        this.ballroomCalc.setDepth(depthval);
+        this.updateEstimate();
+    }
+
+    @OnTextChanged(value = R.id.decimalRadius, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    void updateRadius() {
+        String radius = etRadius.getText().toString();
+        double radiusval = inputValidator(radius);
+        this.ballroomCalc.setRadius(radiusval);
+        this.updateEstimate();
+    }
+
+    /**
+     * Updates the cost/ball count estimate TextView
+     */
+    public void updateEstimate() {
+        if (wasEasy != this.ballroomCalc.isEasyMode()) {
+            if (this.ballroomCalc.isEasyMode()) {
+                llRadius.setVisibility(View.GONE);
+                llEfficiency.setVisibility(View.GONE);
             } else {
-                et.setText(("1.675"));
+                llRadius.setVisibility(View.VISIBLE);
+                llEfficiency.setVisibility(View.VISIBLE);
             }
-            EasyMode = true;
-        } else {
-            llRadius.setVisibility(View.VISIBLE);
-            llEfficiency.setVisibility(View.VISIBLE);
-            EasyMode = false;
+            wasEasy = easyswitch.isChecked();
         }
-    }
-
-    private void SetCount()
-    {
-        try {
-            String strarea = etArea.getText().toString();
-            String strdepth = etDepth.getText().toString();
-            String strradius = etRadius.getText().toString();
-            String strmoney = etMoney.getText().toString();
-            String textresult = "";
-            if (!strarea.isEmpty() && !strdepth.isEmpty() && !strradius.isEmpty() &&
-                    !strmoney.isEmpty()) {
-                Double area = Double.parseDouble(strarea);
-                Double depth = Double.parseDouble(strdepth);
-                Double radius = Double.parseDouble(strradius);
-                Double money = Double.parseDouble(strmoney);
-                if (area > 0D && depth > 0 && radius > 0 && money > 0) {
-                    if (isMetric) {
-                        //MetricEstimate(efficiency, area, depth, radius, money);
-                        this.balls = BallroomCalc.estimateBalls(efficiency, area, depth, radius,
-                                money, BallroomCalc.cubcmpercubm);
-                    } else {
-                        this.balls = BallroomCalc.estimateBalls(efficiency, area, depth, radius,
-                                money, BallroomCalc.cubinpercubft);
-                    }
-                    Resources res = getResources();
-                    textresult = String.format(res.getString(R.string.formatedresult),
-                            round(balls, 2), round(cost, 2));
-                }
+        if (wasMetric != this.ballroomCalc.isMetric()) {
+            if (this.ballroomCalc.isMetric()) {
+                unitsmall.setText(R.string.centimeter);
+                unitsquared.setText(R.string.MeterSquared);
+                unitstd.setText(R.string.Meter);
+            } else {
+                unitsmall.setText(R.string.Inchs);
+                unitsquared.setText(R.string.FeetSquared);
+                unitstd.setText(R.string.Feet);
             }
-            finaltext.setText(textresult);
+            wasMetric = this.ballroomCalc.isMetric();
+        }
+        try {
+            finaltext.setText(String.format(this.formattedResult,
+                    round(this.ballroomCalc.getBalls(), 2), this.currency,
+                    round(this.ballroomCalc.getCost(), 2)));
         } catch (Exception ex) {
             ex.printStackTrace();
+            finaltext.setText("");
         }
-    }
-
-    @OnTextChanged(value = {R.id.decimalArea, R.id.decimalDepth, R.id.decimalMoney,
-            R.id.decimalRadius}, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-    void updateCount() {
-        SetCount();
     }
 
     @Override
@@ -219,5 +238,4 @@ public class activity_main extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 }

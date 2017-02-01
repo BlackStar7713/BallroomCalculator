@@ -63,7 +63,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_margin="4dp"
-            android:text="64%"
+            android:text="@string/default_percent"
             android:textAppearance="?android:attr/textAppearanceLarge" />
     </LinearLayout>
 
@@ -80,6 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
+            android:labelFor="@+id/decimalArea"
             android:text="@string/BallArea" />
 
         <EditText
@@ -91,7 +92,7 @@
             android:ems="10"
             android:inputType="numberDecimal"
             android:maxLength="10"
-            android:text="674" />
+            android:text="@string/default_area" />
 
         <TextView
             android:id="@+id/txtunitSquared"
@@ -113,6 +114,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
+            android:labelFor="@+id/decimalDepth"
             android:text="@string/BallDepth" />
 
         <EditText
@@ -124,7 +126,7 @@
             android:ems="10"
             android:inputType="numberDecimal"
             android:maxLength="10"
-            android:text="2" />
+            android:text="@string/default_depth" />
 
         <TextView
             android:id="@+id/txtunitstd"
@@ -146,6 +148,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
+            android:labelFor="@+id/decimalRadius"
             android:text="@string/BallRadius" />
 
         <EditText
@@ -157,7 +160,7 @@
             android:ems="10"
             android:inputType="numberDecimal"
             android:maxLength="10"
-            android:text="1.675" />
+            android:text="@string/default_radius" />
 
         <TextView
             android:id="@+id/txtunitsmall"
@@ -181,6 +184,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="4dp"
+            android:labelFor="@+id/decimalMoney"
             android:text="@string/BallPrice" />
 
         <EditText
@@ -193,7 +197,7 @@
             android:ems="10"
             android:inputType="numberDecimal"
             android:maxLength="10"
-            android:text=".20" />
+            android:text="@string/default_money" />
 
         <TextView
             android:id="@+id/txtunitmoney"
@@ -201,7 +205,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="4dp"
-            android:text="@string/muricadollars" />
+            android:text="@string/default_currency" />
     </LinearLayout>
 
     <TextView

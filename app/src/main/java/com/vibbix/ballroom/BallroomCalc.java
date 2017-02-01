@@ -10,11 +10,13 @@ public class BallroomCalc {
     //region constants
     public static final BigDecimal cubcmpercubm = BigDecimal.valueOf(Math.pow(10, 6));
     public static final BigDecimal cubinpercubft = BigDecimal.valueOf(1728D);
-    //Keplar conjecture
     public static final BigDecimal maxdensity = BigDecimal.valueOf(Math.PI)
             .divide(BigDecimal.valueOf(3.0D)
                     .multiply(BigDecimal.valueOf(Math.sqrt(2.0D))), BigDecimal.ROUND_HALF_EVEN)
             .multiply(BigDecimal.valueOf(100.0D));
+    public static final double EASY_RADIUS_METRIC = 6.477D; //1.675 cm
+    public static final double EASY_RADIUS_IMPERIAL = 2.55D; //2.55 in
+    public static final double EASY_EFFICIENCY = 65.0D; //65.0%
     //endregion
     private boolean isMetric = false;
     private int balls = 0;
@@ -24,11 +26,15 @@ public class BallroomCalc {
     private double price = 0.0D;
     private double depth = 0.0D;
     private double efficiency = 0.0D;
+    private boolean easymode = false;
 
+    /**
+     * Creates a new instance of the BallroomCalculator
+     */
     public BallroomCalc() {
     }
-    //region Getters/Setters
 
+    //endregion
     //region static methods
     public static int estimateBalls(double efficiency, double footage, double depth, double radius,
                                     double price, BigDecimal measurementscale) {
@@ -49,6 +55,7 @@ public class BallroomCalc {
         }
         return (int) Math.floor(value);
     }
+    //region Getters/Setters
 
     public static double clamp(double value, double min, double max) {
         if (value < min) {
@@ -60,7 +67,16 @@ public class BallroomCalc {
         return value;
     }
 
-    ;
+    /**
+     * Updates the computed values of the class
+     */
+    public void updateValues() {
+        this.balls = estimateBalls(this.easymode ? EASY_EFFICIENCY : this.efficiency, this.area,
+                this.depth, this.easymode ?
+                        (this.isMetric ? EASY_RADIUS_METRIC : EASY_RADIUS_IMPERIAL) : this.radius,
+                this.cost, this.isMetric ? cubcmpercubm : cubinpercubft);
+        this.cost = this.balls * this.price;
+    }
 
     /**
      * returns the estimated number of balls that could fit in the designated volume
@@ -134,11 +150,14 @@ public class BallroomCalc {
         this.updateValues();
     }
 
-    //endregion
-    public void updateValues() {
-        this.balls = estimateBalls(this.efficiency, this.area, this.depth, this.radius, this.cost,
-                this.isMetric ? cubcmpercubm : cubinpercubft);
-        this.cost = this.balls * this.price;
+    public boolean isEasyMode() {
+        return this.easymode;
     }
+
+    public void setEasymode(boolean easymode) {
+        this.easymode = easymode;
+        this.updateValues();
+    }
+
     //endregion
 }
