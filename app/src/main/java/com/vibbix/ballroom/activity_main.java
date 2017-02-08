@@ -294,7 +294,6 @@ public class activity_main extends AppCompatActivity {
         //must commit, background thread will not save
         edit.commit();
     }
-
     private void loadPreferences() {
         SharedPreferences settings = getApplicationContext().getSharedPreferences(prefsName, 0);
         this.ballroomCalc.setArea(settings.getFloat(prefsArea, 674.0f));
@@ -321,6 +320,7 @@ public class activity_main extends AppCompatActivity {
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         }
+        this.getDelegate().applyDayNight();
     }
 
     private void refresh() {
@@ -333,11 +333,6 @@ public class activity_main extends AppCompatActivity {
         onMetricSwitch();
         onSwitchEasy();
         skpacking.setProgress(skpacking.getProgress());
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 
     @Override

@@ -39,6 +39,9 @@ public class BallroomCalc {
     public static int estimateBalls(double efficiency, double footage, double depth, double radius,
                                     double price, BigDecimal measurementscale) {
         double value = 0.0D;
+        if (efficiency == 0.0D || footage == 0.0D || depth == 0.0D || radius == 0.0D){
+            return 0;
+        }
         try {
             efficiency = efficiency / 100;
             BigDecimal wholevolume = BigDecimal.valueOf(footage * depth);

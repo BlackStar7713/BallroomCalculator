@@ -119,6 +119,7 @@ public class activity_about extends AppCompatActivity {
             edit.putString(prefsNightmode, nightmodeItems[3]);
         }
         edit.apply();
+        this.getDelegate().applyDayNight();
     }
 
     private void loadNightMode() {
@@ -132,7 +133,6 @@ public class activity_about extends AppCompatActivity {
             this.nightmode.setSelection(2, true);
         else if (mode.equals("Follow"))
             this.nightmode.setSelection(3, true);
-
     }
 
 
