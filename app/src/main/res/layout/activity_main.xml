@@ -1,11 +1,23 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="calc"
+            type="com.vibbix.ballroom.ObservableBallRoomCalculator" />
+
+        <import type="android.view.View" />
+    </data>
+
+    <LinearLayout
     android:id="@+id/transition_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_weight="1"
     android:orientation="vertical"
-    android:weightSum="1"
-    android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:weightSum="1">
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -26,6 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="4dp"
+            android:checked="@={calc.isMetric}"
             android:text="@string/Metric" />
 
         <Switch
@@ -34,6 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="4dp"
+            android:checked="@={calc.isEasy}"
             android:text="@string/EasyMode" />
     </LinearLayout>
 
@@ -41,7 +55,8 @@
         android:id="@+id/llEfficiency"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:fadeVisible="@{!calc.isEasy}">
 
         <TextView
             android:id="@+id/txtEfficiency"
@@ -57,7 +72,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            android:progress="64" />
+            android:progress="@={calc.efficiency, default=64}" />
 
         <TextView
             android:id="@+id/txtEfficiencyPercent"
@@ -94,7 +109,7 @@
             android:ems="10"
             android:inputType="numberDecimal"
             android:maxLength="10"
-            android:text="@string/default_area" />
+            android:text="@={calc.area, default=@string/default_area}" />
 
         <TextView
             android:id="@+id/txtunitSquared"
@@ -128,7 +143,7 @@
             android:ems="10"
             android:inputType="numberDecimal"
             android:maxLength="10"
-            android:text="@string/default_depth" />
+            android:text="@={calc.depth, default=@string/default_depth}" />
 
         <TextView
             android:id="@+id/txtunitstd"
@@ -143,7 +158,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        app:fadeVisible="@{!calc.isEasy}">
+        <!--android:visibility="@{switchEasy.checked ? View.GONE : View.VISIBLE}">-->
+        <!--app:fadeVisible="@={calc.isEasy}">-->
 
         <TextView
             android:id="@+id/txtconstRadius"
@@ -162,7 +180,7 @@
             android:ems="10"
             android:inputType="numberDecimal"
             android:maxLength="10"
-            android:text="@string/default_radius" />
+            android:text="@={calc.radius, default=@string/default_radius}" />
 
         <TextView
             android:id="@+id/txtunitsmall"
@@ -199,7 +217,7 @@
             android:ems="10"
             android:inputType="numberDecimal"
             android:maxLength="10"
-            android:text="@string/default_money" />
+            android:text="@={calc.price, default=@string/default_money}" />
 
         <TextView
             android:id="@+id/txtunitmoney"
@@ -216,6 +234,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_margin="4sp"
+        android:text="@{calc.balls < 1 ? `` : @string/nameFormat(calc.balls, calc.price)}"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-
 </LinearLayout>
+</layout>

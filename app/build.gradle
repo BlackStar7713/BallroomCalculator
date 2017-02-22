@@ -6,7 +6,9 @@ apply plugin: 'jacoco'
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
-
+    dataBinding {
+        enabled = true
+    }
     defaultConfig {
         applicationId "com.vibbix.ballroom"
         minSdkVersion 18
@@ -48,11 +50,11 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.andkulikov:transitionseverywhere:1.7.0'
-    compile 'com.android.support:appcompat-v7:25.1.1'
+    compile 'com.android.support:appcompat-v7:25.2.0'
     testCompile 'junit:junit:4.12'
     testCompile 'org.robolectric:robolectric:3.1.4'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
-    androidTestCompile 'com.android.support:support-annotations:25.1.1'
+    androidTestCompile 'com.android.support:support-annotations:25.2.0'
     compile 'com.jakewharton:butterknife:8.5.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
     androidTestCompile 'com.android.support.test:runner:0.5'

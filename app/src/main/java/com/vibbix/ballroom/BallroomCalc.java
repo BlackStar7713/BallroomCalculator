@@ -81,7 +81,6 @@ public class BallroomCalc {
                 this.cost, this.isMetric ? CUBCM_PER_CUBM : CUBIN_PER_CUBFT);
         this.cost = this.balls * this.price;
     }
-
     /**
      * returns the estimated number of balls that could fit in the designated volume
      *
