@@ -164,7 +164,7 @@ public class activity_main extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
-        skpacking.setMax(BallroomCalc.maxdensity.intValue());
+        skpacking.setMax(BallroomCalc.MAX_DENSITY.intValue());
         this.loadPreferences();
     }
 
@@ -311,14 +311,19 @@ public class activity_main extends AppCompatActivity {
     private void applyNightMode() {
         SharedPreferences settings = getApplicationContext().getSharedPreferences(prefsName, 0);
         String nightMode = settings.getString(prefsNightmode, "Auto");
-        if (nightMode.equals("Auto")) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
-        } else if (nightMode.equals("Night")) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else if (nightMode.equals("Day")) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        switch (nightMode) {
+            case "Auto":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
+                break;
+            case "Night":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            case "Day":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            default:
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                break;
         }
         this.getDelegate().applyDayNight();
     }

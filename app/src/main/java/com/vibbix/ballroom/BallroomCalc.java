@@ -8,9 +8,9 @@ import java.math.RoundingMode;
  */
 public class BallroomCalc {
     //region constants
-    public static final BigDecimal cubcmpercubm = BigDecimal.valueOf(Math.pow(10, 6));
-    public static final BigDecimal cubinpercubft = BigDecimal.valueOf(1728D);
-    public static final BigDecimal maxdensity = BigDecimal.valueOf(Math.PI)
+    public static final BigDecimal CUBCM_PER_CUBM = BigDecimal.valueOf(Math.pow(10, 6));
+    public static final BigDecimal CUBIN_PER_CUBFT = BigDecimal.valueOf(1728D);
+    public static final BigDecimal MAX_DENSITY = BigDecimal.valueOf(Math.PI)
             .divide(BigDecimal.valueOf(3.0D)
                     .multiply(BigDecimal.valueOf(Math.sqrt(2.0D))), BigDecimal.ROUND_HALF_EVEN)
             .multiply(BigDecimal.valueOf(100.0D));
@@ -36,6 +36,7 @@ public class BallroomCalc {
 
     //endregion
     //region static methods
+
     public static int estimateBalls(double efficiency, double footage, double depth, double radius,
                                     double price, BigDecimal measurementscale) {
         double value = 0.0D;
@@ -77,7 +78,7 @@ public class BallroomCalc {
         this.balls = estimateBalls(this.easymode ? EASY_EFFICIENCY : this.efficiency, this.area,
                 this.depth, this.easymode ?
                         (this.isMetric ? EASY_RADIUS_METRIC : EASY_RADIUS_IMPERIAL) : this.radius,
-                this.cost, this.isMetric ? cubcmpercubm : cubinpercubft);
+                this.cost, this.isMetric ? CUBCM_PER_CUBM : CUBIN_PER_CUBFT);
         this.cost = this.balls * this.price;
     }
 
@@ -140,7 +141,7 @@ public class BallroomCalc {
     }
 
     public void setEfficiency(double efficiency) {
-        this.efficiency = clamp(efficiency, 0, maxdensity.doubleValue());
+        this.efficiency = clamp(efficiency, 0, MAX_DENSITY.doubleValue());
         this.updateValues();
     }
 
