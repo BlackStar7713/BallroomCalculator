@@ -3,25 +3,28 @@ package com.vibbix.ballroom;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.databinding.BindingAdapter;
+import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.transitionseverywhere.TransitionManager;
+import com.vibbix.ballroom.databinding.ActivityMainBinding;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import org.parceler.Parcels;
+
 import java.util.Currency;
 import java.util.Locale;
 
@@ -29,51 +32,17 @@ import butterknife.BindArray;
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnCheckedChanged;
-import butterknife.OnTextChanged;
 
 public class activity_main extends AppCompatActivity {
+    private static final String TAG = "activity_main";
+    private static final String PARCEL = "main_parcel";
     //region binded fields
-    @BindView(R.id.decimalArea)
-    EditText etArea;
-    @BindView(R.id.decimalDepth)
-    EditText etDepth;
-    @BindView(R.id.decimalRadius)
-    EditText etRadius;
-    @BindView(R.id.decimalMoney)
-    EditText etMoney;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @BindView(R.id.switchMetric)
-    Switch swmetric;
-    @BindView(R.id.txtResult)
-    TextView finaltext;
-    @BindView(R.id.switchEasy)
-    Switch easyswitch;
-    @BindView(R.id.llEfficiency)
-    LinearLayout llEfficiency;
-    @BindView(R.id.llRadius)
-    LinearLayout llRadius;
     @BindView(R.id.llSwitch)
     LinearLayout llswitch;
-    @BindView(R.id.txtunitmoney)
-    TextView money;
-    @BindView(R.id.txtunitsmall)
-    TextView unitsmall;
-    @BindView(R.id.txtunitSquared)
-    TextView unitsquared;
-    @BindView(R.id.txtunitstd)
-    TextView unitstd;
     @BindView(R.id.seekEfficiency)
     SeekBar skpacking;
-    @BindView(R.id.txtEfficiencyPercent)
-    TextView tvPercent;
-    @BindString(R.string.percentFormatter)
-    String percentFormatter;
-    @BindString(R.string.formattedresult)
-    String formattedResult;
-    @BindView(R.id.transition_container)
-    ViewGroup transition_container;
     @BindString(R.string.link_github)
     String githublink;
     @BindString(R.string.link_project)
@@ -98,47 +67,38 @@ public class activity_main extends AppCompatActivity {
     String prefsNightmode;
     @BindArray(R.array.spinner_nightmode_items)
     String[] nightmodeItems;
+    @BindView(R.id.txtunitsmall)
+    TextView unitsmall;
     //endregion
-    private BallroomCalc ballroomCalc;
-    private boolean wasMetric = false;
-    private boolean wasEasy = false;
+    private ObservableBallRoomCalculator observableBallRoomCalculator;
     private String currency;
-    /**
-     * Rounds a number to a certain amount of decimal points
-     *
-     * @param value  The double value
-     * @param places Number of place
-     * @return Rounded number
-     */
-    public static double round(double value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
-        BigDecimal bd = new BigDecimal(value);
-        bd = bd.setScale(places, RoundingMode.HALF_UP);
-        return bd.doubleValue();
-    }
 
-    /**
-     * Parses a string as a double
-     *
-     * @param d input string
-     * @return a verified double
-     */
-    public static double inputValidator(String d) {
-        try {
-            return Double.valueOf(d.isEmpty() ? "0.0" : d);
-        } catch (Exception ex) {
-            return 0.0D;
+    @BindingAdapter("fadeVisible")
+    public static void setFadeVisible(final View view, boolean visible) {
+        if (view.getTag() == null) {
+            view.setTag(true);
+        } else {
+            ViewGroup transitions_container = (ViewGroup) view.getParent();
+            TransitionManager.beginDelayedTransition(transitions_container);
         }
+        view.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        applyNightMode();
-        setContentView(R.layout.activity_main);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
+        //applyNightMode();
+        ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        if (savedInstanceState == null){
+            this.observableBallRoomCalculator = new ObservableBallRoomCalculator();
+            this.loadPreferences();
+        } else {
+            this.observableBallRoomCalculator = Parcels.unwrap(savedInstanceState.getParcelable(PARCEL));
+        }
+        binding.setCalc(this.observableBallRoomCalculator);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-        this.ballroomCalc = new BallroomCalc();
         try {
             this.currency = Currency.getInstance(Locale.getDefault()).getSymbol();
         } catch (Exception ex) {
@@ -146,109 +106,11 @@ public class activity_main extends AppCompatActivity {
             this.currency = "$";
         }
         //fix for linear layout issue
-        float density = getResources().getDisplayMetrics().density;
-        if (density <= 1.5f){
+        if (getResources().getDisplayMetrics().density <= 1.5f)
             llswitch.setOrientation(LinearLayout.VERTICAL);
-        }
-        //seekbar watcher
-        skpacking.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                tvPercent.setText(String.format(percentFormatter, Integer.toString(progress)));
-                ballroomCalc.setEfficiency(progress);
-                updateEstimate();
-            }
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-        });
-        skpacking.setMax(BallroomCalc.MAX_DENSITY.intValue());
-        this.loadPreferences();
-    }
+        skpacking.setMax(ObservableBallRoomCalculator.MAX_DENSITY.intValue());
 
-    @OnCheckedChanged(R.id.switchMetric)
-    void onMetricSwitch() {
-        this.ballroomCalc.setIsMetric(swmetric.isChecked());
-        this.updateEstimate();
     }
-
-    @OnCheckedChanged(R.id.switchEasy)
-    void onSwitchEasy() {
-        this.ballroomCalc.setEasymode(easyswitch.isChecked());
-        this.updateEstimate();
-    }
-
-    @OnTextChanged(value = R.id.decimalArea, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-    void updateArea() {
-        String area = etArea.getText().toString();
-        double areaval = inputValidator(area);
-        this.ballroomCalc.setArea(areaval);
-        this.updateEstimate();
-    }
-
-    @OnTextChanged(value = R.id.decimalMoney, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-    void updateMoney() {
-        String money = etMoney.getText().toString();
-        double moneyval = inputValidator(money);
-        this.ballroomCalc.setPrice(moneyval);
-        this.updateEstimate();
-    }
-
-    @OnTextChanged(value = R.id.decimalDepth, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-    void updateDepth() {
-        String depth = etDepth.getText().toString();
-        double depthval = inputValidator(depth);
-        this.ballroomCalc.setDepth(depthval);
-        this.updateEstimate();
-    }
-
-    @OnTextChanged(value = R.id.decimalRadius, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-    void updateRadius() {
-        String radius = etRadius.getText().toString();
-        double radiusval = inputValidator(radius);
-        this.ballroomCalc.setRadius(radiusval);
-        this.updateEstimate();
-    }
-
-    /**
-     * Updates the cost/ball count estimate TextView
-     */
-    public void updateEstimate() {
-        if (wasEasy != this.ballroomCalc.isEasyMode()) {
-            TransitionManager.beginDelayedTransition(transition_container);
-            if (this.ballroomCalc.isEasyMode()) {
-                llRadius.setVisibility(View.GONE);
-                llEfficiency.setVisibility(View.GONE);
-            } else {
-                llRadius.setVisibility(View.VISIBLE);
-                llEfficiency.setVisibility(View.VISIBLE);
-            }
-            wasEasy = easyswitch.isChecked();
-        }
-        if (wasMetric != this.ballroomCalc.isMetric()) {
-            if (this.ballroomCalc.isMetric()) {
-                unitsmall.setText(R.string.centimeter);
-                unitsquared.setText(R.string.MeterSquared);
-                unitstd.setText(R.string.Meter);
-            } else {
-                unitsmall.setText(R.string.Inchs);
-                unitsquared.setText(R.string.FeetSquared);
-                unitstd.setText(R.string.Feet);
-            }
-            wasMetric = this.ballroomCalc.isMetric();
-        }
-        try {
-            finaltext.setText(String.format(this.formattedResult,
-                    this.ballroomCalc.getBalls(), this.currency,
-                    round(this.ballroomCalc.getCost(), 2)));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            finaltext.setText("");
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -283,29 +145,47 @@ public class activity_main extends AppCompatActivity {
 
     @SuppressLint("CommitPrefEdits")
     private void savePreferences() {
-        SharedPreferences settings = getApplicationContext().getSharedPreferences(prefsName, 0);
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor edit = settings.edit();
-        edit.putFloat(prefsArea, (float) this.ballroomCalc.getArea());
-        edit.putFloat(prefsDepth, (float) this.ballroomCalc.getDepth());
-        edit.putBoolean(prefsEasy, this.ballroomCalc.isEasyMode());
-        edit.putFloat(prefsEfficiency, (float) this.ballroomCalc.getEfficiency());
-        edit.putBoolean(prefsMetric, this.ballroomCalc.isMetric());
-        edit.putFloat(prefsCost, (float) this.ballroomCalc.getPrice());
+        edit.putFloat(prefsArea, (float) this.observableBallRoomCalculator.area.get());
+        edit.putFloat(prefsDepth, (float) this.observableBallRoomCalculator.depth.get());
+        edit.putBoolean(prefsEasy, this.observableBallRoomCalculator.isEasy.get());
+        edit.putFloat(prefsEfficiency, (float) this.observableBallRoomCalculator.efficiency.get());
+        edit.putBoolean(prefsMetric, this.observableBallRoomCalculator.isMetric.get());
+        edit.putFloat(prefsRadius, (float) this.observableBallRoomCalculator.radius.get());
+        edit.putFloat(prefsCost, (float) this.observableBallRoomCalculator.price.get());
         //must commit, background thread will not save
         edit.commit();
+        Log.d(TAG, "Saving to preferences");
     }
+
     private void loadPreferences() {
-        SharedPreferences settings = getApplicationContext().getSharedPreferences(prefsName, 0);
-        this.ballroomCalc.setArea(settings.getFloat(prefsArea, 674.0f));
-        this.ballroomCalc.setDepth(settings.getFloat(prefsDepth, 2.0f));
-        this.ballroomCalc.setEasymode(settings.getBoolean(prefsEasy, false));
-        this.ballroomCalc.setEfficiency(settings.getFloat(prefsEfficiency, 64.0f));
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        float area = settings.getFloat(prefsArea, 674.0f);
+        float depth = settings.getFloat(prefsDepth, 2.0f);
+        boolean isEasy = settings.getBoolean(prefsEasy, false);
+        int efficiency = (int) settings.getFloat(prefsEfficiency, 64.0f);
         boolean useImperial = Locale.getDefault().getCountry().equals("US")
                 || Locale.getDefault().getCountry().equals("LR")
                 || Locale.getDefault().getCountry().equals("MM");
-        this.ballroomCalc.setIsMetric(settings.getBoolean(prefsMetric, !useImperial));
-        this.ballroomCalc.setPrice(settings.getFloat(prefsCost, 0.20f));
-        this.refresh();
+        float radius = settings.getFloat(prefsRadius, 1.675f);
+        float price = settings.getFloat(prefsCost, 0.20f);
+        Log.v(TAG, "loadPref area: " + area);
+        Log.v(TAG, "loadPref depth: " + depth);
+        Log.v(TAG, "loadPref isEasy: " + isEasy);
+        Log.v(TAG, "loadPref efficiency: " + efficiency);
+        Log.v(TAG, "loadPref isMetric: " + useImperial);
+        Log.v(TAG, "loadPref radius: " + radius);
+        Log.v(TAG, "loadPref price: " + price);
+        this.observableBallRoomCalculator.area.set(area);
+        this.observableBallRoomCalculator.depth.set(depth);
+        this.observableBallRoomCalculator.isEasy.set(isEasy);
+        this.observableBallRoomCalculator.efficiency.set(efficiency);
+        this.observableBallRoomCalculator.isMetric.set(settings.getBoolean(prefsMetric, !useImperial));
+        this.observableBallRoomCalculator.radius.set(radius);
+        this.observableBallRoomCalculator.price.set(price);
+        Log.d(TAG, "Loaded from preferences");
+
     }
 
     private void applyNightMode() {
@@ -326,29 +206,26 @@ public class activity_main extends AppCompatActivity {
                 break;
         }
         this.getDelegate().applyDayNight();
-    }
-
-    private void refresh() {
-        updateArea();
-        updateDepth();
-        updateMoney();
-        updateRadius();
-        wasEasy = !easyswitch.isChecked();
-        wasMetric = !swmetric.isChecked();
-        onMetricSwitch();
-        onSwitchEasy();
-        skpacking.setProgress(skpacking.getProgress());
+        Log.d(TAG, "Night mode applied");
     }
 
     @Override
-    public void onStop() {
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(PARCEL, Parcels.wrap(this.observableBallRoomCalculator));
+        Log.d(TAG, "InstanceState bundle saved");
+    }
+
+    @Override
+    protected void onStop() {
         super.onStop();
         this.savePreferences();
+        Log.d(TAG, "Main Activity stopped");
     }
-
     @Override
-    public void onPause() {
+    protected void onPause() {
         super.onPause();
         this.savePreferences();
+        Log.d(TAG, "Main Activity paused");
     }
 }
