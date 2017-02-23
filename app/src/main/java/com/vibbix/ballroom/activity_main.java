@@ -7,18 +7,17 @@ import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.transitionseverywhere.TransitionManager;
@@ -26,8 +25,6 @@ import com.vibbix.ballroom.databinding.ActivityMainBinding;
 
 import org.parceler.Parcels;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Currency;
 import java.util.Locale;
 
@@ -37,6 +34,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class activity_main extends AppCompatActivity {
+    private static final String TAG = "activity_main";
+    private static final String PARCEL = "main_parcel";
     //region binded fields
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -68,14 +67,11 @@ public class activity_main extends AppCompatActivity {
     String prefsNightmode;
     @BindArray(R.array.spinner_nightmode_items)
     String[] nightmodeItems;
+    @BindView(R.id.txtunitsmall)
+    TextView unitsmall;
     //endregion
-    private BallroomCalc ballroomCalc;
     private ObservableBallRoomCalculator observableBallRoomCalculator;
-    private boolean wasMetric = false;
-    private boolean wasEasy = false;
     private String currency;
-    private static final String TAG = "activity_main";
-    private static final String PARCEL = "main_parcel";
 
     @BindingAdapter("fadeVisible")
     public static void setFadeVisible(final View view, boolean visible) {
@@ -95,6 +91,7 @@ public class activity_main extends AppCompatActivity {
         ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         if (savedInstanceState == null){
             this.observableBallRoomCalculator = new ObservableBallRoomCalculator();
+            this.loadPreferences();
         } else {
             this.observableBallRoomCalculator = Parcels.unwrap(savedInstanceState.getParcelable(PARCEL));
         }
@@ -108,12 +105,10 @@ public class activity_main extends AppCompatActivity {
             this.currency = "$";
         }
         //fix for linear layout issue
-        float density = getResources().getDisplayMetrics().density;
-        if (density <= 1.5f){
+        if (getResources().getDisplayMetrics().density <= 1.5f)
             llswitch.setOrientation(LinearLayout.VERTICAL);
-        }
         skpacking.setMax(BallroomCalc.MAX_DENSITY.intValue());
-        this.loadPreferences();
+
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -149,29 +144,34 @@ public class activity_main extends AppCompatActivity {
 
     @SuppressLint("CommitPrefEdits")
     private void savePreferences() {
-        SharedPreferences settings = getApplicationContext().getSharedPreferences(prefsName, 0);
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor edit = settings.edit();
-        edit.putFloat(prefsArea, (float) this.ballroomCalc.getArea());
-        edit.putFloat(prefsDepth, (float) this.ballroomCalc.getDepth());
-        edit.putBoolean(prefsEasy, this.ballroomCalc.isEasyMode());
-        edit.putFloat(prefsEfficiency, (float) this.ballroomCalc.getEfficiency());
-        edit.putBoolean(prefsMetric, this.ballroomCalc.isMetric());
-        edit.putFloat(prefsCost, (float) this.ballroomCalc.getPrice());
+        edit.putFloat(prefsArea, (float) this.observableBallRoomCalculator.area.get());
+        edit.putFloat(prefsDepth, (float) this.observableBallRoomCalculator.depth.get());
+        edit.putBoolean(prefsEasy, this.observableBallRoomCalculator.isEasy.get());
+        edit.putFloat(prefsEfficiency, (float) this.observableBallRoomCalculator.efficiency.get());
+        edit.putBoolean(prefsMetric, this.observableBallRoomCalculator.isMetric.get());
+        edit.putFloat(prefsRadius, (float) this.observableBallRoomCalculator.radius.get());
+        edit.putFloat(prefsCost, (float) this.observableBallRoomCalculator.cost.get());
         //must commit, background thread will not save
         edit.commit();
+        Log.d(TAG, "Saving to preferences");
     }
 
     private void loadPreferences() {
-        SharedPreferences settings = getApplicationContext().getSharedPreferences(prefsName, 0);
-//        this.ballroomCalc.setArea(settings.getFloat(prefsArea, 674.0f));
-//        this.ballroomCalc.setDepth(settings.getFloat(prefsDepth, 2.0f));
-//        this.ballroomCalc.setEasymode(settings.getBoolean(prefsEasy, false));
-//        this.ballroomCalc.setEfficiency(settings.getFloat(prefsEfficiency, 64.0f));
-//        boolean useImperial = Locale.getDefault().getCountry().equals("US")
-//                || Locale.getDefault().getCountry().equals("LR")
-//                || Locale.getDefault().getCountry().equals("MM");
-//        this.ballroomCalc.setIsMetric(settings.getBoolean(prefsMetric, !useImperial));
-//        this.ballroomCalc.setPrice(settings.getFloat(prefsCost, 0.20f));
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        this.observableBallRoomCalculator.area.set(settings.getFloat(prefsArea, 674.0f));
+        this.observableBallRoomCalculator.depth.set(settings.getFloat(prefsDepth, 2.0f));
+        this.observableBallRoomCalculator.isEasy.set(settings.getBoolean(prefsEasy, false));
+        this.observableBallRoomCalculator.efficiency.set((int) settings.getFloat(prefsEfficiency, 64.0f));
+        boolean useImperial = Locale.getDefault().getCountry().equals("US")
+                || Locale.getDefault().getCountry().equals("LR")
+                || Locale.getDefault().getCountry().equals("MM");
+        this.observableBallRoomCalculator.isMetric.set(settings.getBoolean(prefsMetric, !useImperial));
+        this.observableBallRoomCalculator.radius.set(settings.getFloat(prefsRadius, 1.675f));
+        this.observableBallRoomCalculator.price.set(settings.getFloat(prefsCost, 0.20f));
+        Log.d(TAG, "Loaded from preferences");
+
     }
 
     private void applyNightMode() {
@@ -192,11 +192,23 @@ public class activity_main extends AppCompatActivity {
                 break;
         }
         this.getDelegate().applyDayNight();
+        Log.d(TAG, "Night mode applied");
+
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(PARCEL, Parcels.wrap(this.observableBallRoomCalculator));
+        Log.d(TAG, "InstanceState bundle saved");
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        this.savePreferences();
+        Log.d(TAG, "Main Activity stopped");
+
     }
 }

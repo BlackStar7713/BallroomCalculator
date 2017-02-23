@@ -18,16 +18,6 @@ public class BallroomCalc {
     public static final double EASY_RADIUS_IMPERIAL = 2.55D; //2.55 in
     public static final double EASY_EFFICIENCY = 65.0D; //65.0%
     //endregion
-    private boolean isMetric = false;
-    private int balls = 0;
-    private double area = 0.0D;
-    private double radius = 0.0D;
-    private double cost = 0.0D;
-    private double price = 0.0D;
-    private double depth = 0.0D;
-    private double efficiency = 0.0D;
-    private boolean easymode = false;
-
     /**
      * Creates a new instance of the BallroomCalculator
      */
@@ -38,7 +28,7 @@ public class BallroomCalc {
     //region static methods
 
     public static int estimateBalls(double efficiency, double footage, double depth, double radius,
-                                    double price, BigDecimal measurementscale) {
+                                    BigDecimal measurementscale) {
         double value = 0.0D;
         if (efficiency == 0.0D || footage == 0.0D || depth == 0.0D || radius == 0.0D){
             return 0;
@@ -59,108 +49,4 @@ public class BallroomCalc {
         }
         return (int) Math.floor(value);
     }
-    //region Getters/Setters
-
-    public static double clamp(double value, double min, double max) {
-        if (value < min) {
-            return min;
-        }
-        if (value > max) {
-            return max;
-        }
-        return value;
-    }
-
-    /**
-     * Updates the computed values of the class
-     */
-    public void updateValues() {
-        this.balls = estimateBalls(this.easymode ? EASY_EFFICIENCY : this.efficiency, this.area,
-                this.depth, this.easymode ?
-                        (this.isMetric ? EASY_RADIUS_METRIC : EASY_RADIUS_IMPERIAL) : this.radius,
-                this.cost, this.isMetric ? CUBCM_PER_CUBM : CUBIN_PER_CUBFT);
-        this.cost = this.balls * this.price;
-    }
-    /**
-     * returns the estimated number of balls that could fit in the designated volume
-     *
-     * @return number of balls
-     */
-    public int getBalls() {
-        return this.balls;
-    }
-
-    /**
-     * Calculates the total cost
-     *
-     * @return Total cost
-     */
-    public double getCost() {
-        return this.cost;
-    }
-
-    public double getArea() {
-        return this.area;
-    }
-
-    public void setArea(double area) {
-        this.area = clamp(area, 0.0D, Double.MAX_VALUE);
-        this.updateValues();
-    }
-
-    public double getDepth() {
-        return this.depth;
-    }
-
-    public void setDepth(double depth) {
-        this.depth = clamp(depth, 0, Double.MAX_VALUE);
-        this.updateValues();
-    }
-
-    public double getRadius() {
-        return this.radius;
-    }
-
-    public void setRadius(double radius) {
-        this.radius = clamp(radius, 0, Double.MAX_VALUE);
-        this.updateValues();
-    }
-
-    public double getPrice() {
-        return this.price;
-    }
-
-    public void setPrice(double price) {
-        this.price = clamp(price, 0, Double.MAX_VALUE);
-        this.cost = this.balls * this.price;
-    }
-
-    public double getEfficiency() {
-        return this.efficiency;
-    }
-
-    public void setEfficiency(double efficiency) {
-        this.efficiency = clamp(efficiency, 0, MAX_DENSITY.doubleValue());
-        this.updateValues();
-    }
-
-    public boolean isMetric() {
-        return this.isMetric;
-    }
-
-    public void setIsMetric(boolean isMetric) {
-        this.isMetric = isMetric;
-        this.updateValues();
-    }
-
-    public boolean isEasyMode() {
-        return this.easymode;
-    }
-
-    public void setEasymode(boolean easymode) {
-        this.easymode = easymode;
-        this.updateValues();
-    }
-
-    //endregion
 }
