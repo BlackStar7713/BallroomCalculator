@@ -7,6 +7,7 @@ import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
@@ -23,6 +24,8 @@ import android.widget.TextView;
 import com.transitionseverywhere.TransitionManager;
 import com.vibbix.ballroom.databinding.ActivityMainBinding;
 
+import org.parceler.Parcels;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Currency;
@@ -35,46 +38,12 @@ import butterknife.ButterKnife;
 
 public class activity_main extends AppCompatActivity {
     //region binded fields
-    @BindView(R.id.decimalArea)
-    EditText etArea;
-    @BindView(R.id.decimalDepth)
-    EditText etDepth;
-    @BindView(R.id.decimalRadius)
-    EditText etRadius;
-    @BindView(R.id.decimalMoney)
-    EditText etMoney;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @BindView(R.id.switchMetric)
-    Switch swmetric;
-    @BindView(R.id.txtResult)
-    TextView finaltext;
-    @BindView(R.id.switchEasy)
-    Switch easyswitch;
-    @BindView(R.id.llEfficiency)
-    LinearLayout llEfficiency;
-    @BindView(R.id.llRadius)
-    LinearLayout llRadius;
     @BindView(R.id.llSwitch)
     LinearLayout llswitch;
-    @BindView(R.id.txtunitmoney)
-    TextView money;
-    @BindView(R.id.txtunitsmall)
-    TextView unitsmall;
-    @BindView(R.id.txtunitSquared)
-    TextView unitsquared;
-    @BindView(R.id.txtunitstd)
-    TextView unitstd;
     @BindView(R.id.seekEfficiency)
     SeekBar skpacking;
-    @BindView(R.id.txtEfficiencyPercent)
-    TextView tvPercent;
-    @BindString(R.string.percentFormatter)
-    String percentFormatter;
-    @BindString(R.string.formattedresult)
-    String formattedResult;
-    @BindView(R.id.transition_container)
-    ViewGroup transition_container;
     @BindString(R.string.link_github)
     String githublink;
     @BindString(R.string.link_project)
@@ -105,57 +74,33 @@ public class activity_main extends AppCompatActivity {
     private boolean wasMetric = false;
     private boolean wasEasy = false;
     private String currency;
-    /**
-     * Rounds a number to a certain amount of decimal points
-     *
-     * @param value  The double value
-     * @param places Number of place
-     * @return Rounded number
-     */
-    public static double round(double value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
-        BigDecimal bd = new BigDecimal(value);
-        bd = bd.setScale(places, RoundingMode.HALF_UP);
-        return bd.doubleValue();
-    }
-
-    /**
-     * Parses a string as a double
-     *
-     * @param d input string
-     * @return a verified double
-     */
-    public static double inputValidator(String d) {
-        try {
-            return Double.valueOf(d.isEmpty() ? "0.0" : d);
-        } catch (Exception ex) {
-            return 0.0D;
-        }
-    }
+    private static final String TAG = "activity_main";
+    private static final String PARCEL = "main_parcel";
 
     @BindingAdapter("fadeVisible")
     public static void setFadeVisible(final View view, boolean visible) {
         if (view.getTag() == null) {
             view.setTag(true);
-            view.setVisibility(visible ? View.VISIBLE : View.GONE);
         } else {
             ViewGroup transitions_container = (ViewGroup) view.getParent();
             TransitionManager.beginDelayedTransition(transitions_container);
-            view.setVisibility(visible ? View.VISIBLE : View.GONE);
         }
+        view.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        applyNightMode();
-        //setContentView(R.layout.activity_main);
+        //applyNightMode();
         ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        this.observableBallRoomCalculator = new ObservableBallRoomCalculator();
+        if (savedInstanceState == null){
+            this.observableBallRoomCalculator = new ObservableBallRoomCalculator();
+        } else {
+            this.observableBallRoomCalculator = Parcels.unwrap(savedInstanceState.getParcelable(PARCEL));
+        }
         binding.setCalc(this.observableBallRoomCalculator);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-        this.ballroomCalc = new BallroomCalc();
         try {
             this.currency = Currency.getInstance(Locale.getDefault()).getSymbol();
         } catch (Exception ex) {
@@ -167,105 +112,9 @@ public class activity_main extends AppCompatActivity {
         if (density <= 1.5f){
             llswitch.setOrientation(LinearLayout.VERTICAL);
         }
-        //seekbar watcher
-//        skpacking.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
-//            @Override
-//            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//                tvPercent.setText(String.format(percentFormatter, Integer.toString(progress)));
-//                ballroomCalc.setEfficiency(progress);
-//                updateEstimate();
-//            }
-//            @Override
-//            public void onStartTrackingTouch(SeekBar seekBar) {}
-//            @Override
-//            public void onStopTrackingTouch(SeekBar seekBar) {
-//            }
-//        });
         skpacking.setMax(BallroomCalc.MAX_DENSITY.intValue());
         this.loadPreferences();
     }
-
-    //@OnCheckedChanged(R.id.switchMetric)
-    void onMetricSwitch() {
-        this.ballroomCalc.setIsMetric(swmetric.isChecked());
-        this.updateEstimate();
-    }
-
-    //@OnCheckedChanged(R.id.switchEasy)
-    void onSwitchEasy() {
-        this.ballroomCalc.setEasymode(easyswitch.isChecked());
-        this.updateEstimate();
-    }
-
-    //@OnTextChanged(value = R.id.decimalArea, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-    void updateArea() {
-        String area = etArea.getText().toString();
-        double areaval = inputValidator(area);
-        this.ballroomCalc.setArea(areaval);
-        this.updateEstimate();
-    }
-
-    //@OnTextChanged(value = R.id.decimalMoney, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-    void updateMoney() {
-        String money = etMoney.getText().toString();
-        double moneyval = inputValidator(money);
-        this.ballroomCalc.setPrice(moneyval);
-        this.updateEstimate();
-    }
-
-    //@OnTextChanged(value = R.id.decimalDepth, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-    void updateDepth() {
-        String depth = etDepth.getText().toString();
-        double depthval = inputValidator(depth);
-        this.ballroomCalc.setDepth(depthval);
-        this.updateEstimate();
-    }
-
-    //@OnTextChanged(value = R.id.decimalRadius, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-    void updateRadius() {
-        String radius = etRadius.getText().toString();
-        double radiusval = inputValidator(radius);
-        this.ballroomCalc.setRadius(radiusval);
-        this.updateEstimate();
-    }
-
-    /**
-     * Updates the cost/ball count estimate TextView
-     */
-    public void updateEstimate() {
-        if (wasEasy != this.ballroomCalc.isEasyMode()) {
-//            TransitionManager.beginDelayedTransition(transition_container);
-//            if (this.ballroomCalc.isEasyMode()) {
-//                llRadius.setVisibility(View.GONE);
-//                llEfficiency.setVisibility(View.GONE);
-//            } else {
-//                llRadius.setVisibility(View.VISIBLE);
-//                llEfficiency.setVisibility(View.VISIBLE);
-//            }
-            wasEasy = easyswitch.isChecked();
-        }
-        if (wasMetric != this.ballroomCalc.isMetric()) {
-            if (this.ballroomCalc.isMetric()) {
-                unitsmall.setText(R.string.centimeter);
-                unitsquared.setText(R.string.MeterSquared);
-                unitstd.setText(R.string.Meter);
-            } else {
-                unitsmall.setText(R.string.Inchs);
-                unitsquared.setText(R.string.FeetSquared);
-                unitstd.setText(R.string.Feet);
-            }
-            wasMetric = this.ballroomCalc.isMetric();
-        }
-        try {
-            finaltext.setText(String.format(this.formattedResult,
-                    this.ballroomCalc.getBalls(), this.currency,
-                    round(this.ballroomCalc.getCost(), 2)));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            finaltext.setText("");
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -314,16 +163,15 @@ public class activity_main extends AppCompatActivity {
 
     private void loadPreferences() {
         SharedPreferences settings = getApplicationContext().getSharedPreferences(prefsName, 0);
-        this.ballroomCalc.setArea(settings.getFloat(prefsArea, 674.0f));
-        this.ballroomCalc.setDepth(settings.getFloat(prefsDepth, 2.0f));
-        this.ballroomCalc.setEasymode(settings.getBoolean(prefsEasy, false));
-        this.ballroomCalc.setEfficiency(settings.getFloat(prefsEfficiency, 64.0f));
-        boolean useImperial = Locale.getDefault().getCountry().equals("US")
-                || Locale.getDefault().getCountry().equals("LR")
-                || Locale.getDefault().getCountry().equals("MM");
-        this.ballroomCalc.setIsMetric(settings.getBoolean(prefsMetric, !useImperial));
-        this.ballroomCalc.setPrice(settings.getFloat(prefsCost, 0.20f));
-        this.refresh();
+//        this.ballroomCalc.setArea(settings.getFloat(prefsArea, 674.0f));
+//        this.ballroomCalc.setDepth(settings.getFloat(prefsDepth, 2.0f));
+//        this.ballroomCalc.setEasymode(settings.getBoolean(prefsEasy, false));
+//        this.ballroomCalc.setEfficiency(settings.getFloat(prefsEfficiency, 64.0f));
+//        boolean useImperial = Locale.getDefault().getCountry().equals("US")
+//                || Locale.getDefault().getCountry().equals("LR")
+//                || Locale.getDefault().getCountry().equals("MM");
+//        this.ballroomCalc.setIsMetric(settings.getBoolean(prefsMetric, !useImperial));
+//        this.ballroomCalc.setPrice(settings.getFloat(prefsCost, 0.20f));
     }
 
     private void applyNightMode() {
@@ -346,27 +194,9 @@ public class activity_main extends AppCompatActivity {
         this.getDelegate().applyDayNight();
     }
 
-    private void refresh() {
-        updateArea();
-        updateDepth();
-        updateMoney();
-        updateRadius();
-        wasEasy = !easyswitch.isChecked();
-        wasMetric = !swmetric.isChecked();
-        onMetricSwitch();
-        onSwitchEasy();
-        skpacking.setProgress(skpacking.getProgress());
-    }
-
     @Override
-    public void onStop() {
-        super.onStop();
-        this.savePreferences();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        this.savePreferences();
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(PARCEL, Parcels.wrap(this.observableBallRoomCalculator));
     }
 }

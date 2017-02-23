@@ -6,15 +6,18 @@ import android.databinding.InverseBindingAdapter;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableDouble;
 import android.databinding.ObservableInt;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+
+import org.parceler.Parcel;
 
 import java.math.BigDecimal;
 
 /**
  * A ballroom calculator, but used in conjunction with databinding
  */
-
+@Parcel
 public class ObservableBallRoomCalculator extends BaseObservable {
     public static final BigDecimal CUBCM_PER_CUBM = BigDecimal.valueOf(Math.pow(10, 6));
     public static final BigDecimal CUBIN_PER_CUBFT = BigDecimal.valueOf(1728D);
@@ -44,12 +47,6 @@ public class ObservableBallRoomCalculator extends BaseObservable {
         this.depth = new ObservableDouble(0.0D);
         this.efficiency = new ObservableInt(0);
         this.balls = new ObservableInt(0);
-//        this.isEasy.addOnPropertyChangedCallback(new OnPropertyChangedCallback() {
-//            @Override
-//            public void onPropertyChanged(Observable observable, int i) {
-//                recalculateBalls();
-//            }
-//        });
     }
 
     public ObservableBallRoomCalculator(boolean isEasy, boolean isMetric, double area,
@@ -108,4 +105,5 @@ public class ObservableBallRoomCalculator extends BaseObservable {
                 this.cost.get(), this.isMetric.get() ? CUBCM_PER_CUBM : CUBIN_PER_CUBFT));
         this.cost.set(this.balls.get() * this.price.get());
     }
+
 }
