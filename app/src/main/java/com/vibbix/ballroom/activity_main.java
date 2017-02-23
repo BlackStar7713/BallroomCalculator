@@ -107,7 +107,7 @@ public class activity_main extends AppCompatActivity {
         //fix for linear layout issue
         if (getResources().getDisplayMetrics().density <= 1.5f)
             llswitch.setOrientation(LinearLayout.VERTICAL);
-        skpacking.setMax(BallroomCalc.MAX_DENSITY.intValue());
+        skpacking.setMax(ObservableBallRoomCalculator.MAX_DENSITY.intValue());
 
     }
     @Override
@@ -152,7 +152,7 @@ public class activity_main extends AppCompatActivity {
         edit.putFloat(prefsEfficiency, (float) this.observableBallRoomCalculator.efficiency.get());
         edit.putBoolean(prefsMetric, this.observableBallRoomCalculator.isMetric.get());
         edit.putFloat(prefsRadius, (float) this.observableBallRoomCalculator.radius.get());
-        edit.putFloat(prefsCost, (float) this.observableBallRoomCalculator.cost.get());
+        edit.putFloat(prefsCost, (float) this.observableBallRoomCalculator.price.get());
         //must commit, background thread will not save
         edit.commit();
         Log.d(TAG, "Saving to preferences");
@@ -160,16 +160,29 @@ public class activity_main extends AppCompatActivity {
 
     private void loadPreferences() {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        this.observableBallRoomCalculator.area.set(settings.getFloat(prefsArea, 674.0f));
-        this.observableBallRoomCalculator.depth.set(settings.getFloat(prefsDepth, 2.0f));
-        this.observableBallRoomCalculator.isEasy.set(settings.getBoolean(prefsEasy, false));
-        this.observableBallRoomCalculator.efficiency.set((int) settings.getFloat(prefsEfficiency, 64.0f));
+        float area = settings.getFloat(prefsArea, 674.0f);
+        float depth = settings.getFloat(prefsDepth, 2.0f);
+        boolean isEasy = settings.getBoolean(prefsEasy, false);
+        int efficiency = (int) settings.getFloat(prefsEfficiency, 64.0f);
         boolean useImperial = Locale.getDefault().getCountry().equals("US")
                 || Locale.getDefault().getCountry().equals("LR")
                 || Locale.getDefault().getCountry().equals("MM");
+        float radius = settings.getFloat(prefsRadius, 1.675f);
+        float price = settings.getFloat(prefsCost, 0.20f);
+        Log.v(TAG, "loadPref area: " + area);
+        Log.v(TAG, "loadPref depth: " + depth);
+        Log.v(TAG, "loadPref isEasy: " + isEasy);
+        Log.v(TAG, "loadPref efficiency: " + efficiency);
+        Log.v(TAG, "loadPref isMetric: " + useImperial);
+        Log.v(TAG, "loadPref radius: " + radius);
+        Log.v(TAG, "loadPref price: " + price);
+        this.observableBallRoomCalculator.area.set(area);
+        this.observableBallRoomCalculator.depth.set(depth);
+        this.observableBallRoomCalculator.isEasy.set(isEasy);
+        this.observableBallRoomCalculator.efficiency.set(efficiency);
         this.observableBallRoomCalculator.isMetric.set(settings.getBoolean(prefsMetric, !useImperial));
-        this.observableBallRoomCalculator.radius.set(settings.getFloat(prefsRadius, 1.675f));
-        this.observableBallRoomCalculator.price.set(settings.getFloat(prefsCost, 0.20f));
+        this.observableBallRoomCalculator.radius.set(radius);
+        this.observableBallRoomCalculator.price.set(price);
         Log.d(TAG, "Loaded from preferences");
 
     }
@@ -193,7 +206,6 @@ public class activity_main extends AppCompatActivity {
         }
         this.getDelegate().applyDayNight();
         Log.d(TAG, "Night mode applied");
-
     }
 
     @Override
@@ -201,7 +213,6 @@ public class activity_main extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         outState.putParcelable(PARCEL, Parcels.wrap(this.observableBallRoomCalculator));
         Log.d(TAG, "InstanceState bundle saved");
-
     }
 
     @Override
@@ -209,6 +220,11 @@ public class activity_main extends AppCompatActivity {
         super.onStop();
         this.savePreferences();
         Log.d(TAG, "Main Activity stopped");
-
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.savePreferences();
+        Log.d(TAG, "Main Activity paused");
     }
 }

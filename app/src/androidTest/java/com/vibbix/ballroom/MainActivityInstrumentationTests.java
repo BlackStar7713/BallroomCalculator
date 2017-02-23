@@ -1,5 +1,6 @@
 package com.vibbix.ballroom;
 
+import android.os.SystemClock;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.action.GeneralClickAction;
@@ -23,6 +24,7 @@ import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
@@ -128,12 +130,9 @@ public class MainActivityInstrumentationTests {
     @Test
     public void switchToEasyMode() {
         onView(withId(R.id.switchEasy)).perform(setChecked(true));
-        onView(withId(R.id.seekEfficiency)).check(matches(not(isDisplayed())));
-        onView(withId(R.id.txtEfficiencyPercent)).check(matches(not(isDisplayed())));
-        onView(withId(R.id.txtEfficiency)).check(matches(not(isDisplayed())));
-        onView(withId(R.id.decimalRadius)).check(matches(not(isDisplayed())));
-        onView(withId(R.id.txtconstRadius)).check(matches(not(isDisplayed())));
-        onView(withId(R.id.txtunitsmall)).check(matches(not(isDisplayed())));
+        SystemClock.sleep(500); //wait for animation to finish
+        onView(withId(R.id.llEfficiency)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.llRadius)).check(matches(not(isDisplayed())));
     }
 
     @Test
@@ -191,7 +190,14 @@ public class MainActivityInstrumentationTests {
         onView(withId(R.id.decimalArea)).perform(ViewActions.replaceText("0"));
         onView(withId(R.id.decimalDepth)).perform(ViewActions.replaceText("0"));
         onView(withId(R.id.decimalMoney)).perform(ViewActions.replaceText("0"));
-        onView(withId(R.id.txtResult)).check(matches(not(isDisplayed())));
+        SystemClock.sleep(500); //wait for animation to finish
+        onView(withId(R.id.txtResult)).check(matches(not(isCompletelyDisplayed())));
+    }
+
+    @Test
+    public void noBackspaceCreatingCharacters() {
+        onView(withId(R.id.decimalArea)).perform(ViewActions.replaceText(""));
+        onView(withId(R.id.decimalArea)).check(matches(not(withText("0.00"))));
     }
 
     @Test
@@ -199,6 +205,6 @@ public class MainActivityInstrumentationTests {
         onView(withId(R.id.seekEfficiency)).perform(new GeneralClickAction(Tap.SINGLE,
                 GeneralLocation.CENTER_RIGHT, Press.FINGER));
         onView(withId(R.id.txtEfficiencyPercent)).check(matches(withText(
-                BallroomCalc.MAX_DENSITY.toBigInteger().toString() + "%")));
+                ObservableBallRoomCalculator.MAX_DENSITY.toBigInteger().toString() + "%")));
     }
 }

@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 import org.parceler.Parcel;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Locale;
 
 /**
@@ -23,8 +24,8 @@ public class ObservableBallRoomCalculator extends BaseObservable {
     public static final BigDecimal MAX_DENSITY = BigDecimal.valueOf(Math.PI)
             .divide(BigDecimal.valueOf(3.0D).multiply(BigDecimal.valueOf(Math.sqrt(2.0D))),
                     BigDecimal.ROUND_HALF_EVEN).multiply(BigDecimal.valueOf(100.0D));
-    private static final BigDecimal CUBCM_PER_CUBM = BigDecimal.valueOf(Math.pow(10, 6));
-    private static final BigDecimal CUBIN_PER_CUBFT = BigDecimal.valueOf(1728D);
+    static final BigDecimal CUBCM_PER_CUBM = BigDecimal.valueOf(Math.pow(10, 6));
+    static final BigDecimal CUBIN_PER_CUBFT = BigDecimal.valueOf(1728D);
     private static final double EASY_RADIUS_METRIC = 7.6D; //~3.0cm
     private static final double EASY_RADIUS_IMPERIAL = 3.0D; //2.55 in
     private static final double EASY_EFFICIENCY = 64.0D;
@@ -91,6 +92,9 @@ public class ObservableBallRoomCalculator extends BaseObservable {
     @BindingAdapter("android:text")
     public static void setText(EditText view, double value) {
         boolean setValue = view.getText().length() == 0;
+        if (setValue && value == 0.0D) {
+            return;
+        }
         try {
             if (!setValue) {
                 setValue = Double.parseDouble(view.getText().toString()) != value;
@@ -112,8 +116,31 @@ public class ObservableBallRoomCalculator extends BaseObservable {
         view.setProgress(progress);
     }
 
+    public static int estimateBalls(double efficiency, double footage, double depth, double radius,
+                                    BigDecimal measurementscale) {
+        double value = 0.0D;
+        if (efficiency == 0.0D || footage == 0.0D || depth == 0.0D || radius == 0.0D) {
+            return 0;
+        }
+        try {
+            efficiency = efficiency / 100;
+            BigDecimal wholevolume = BigDecimal.valueOf(footage * depth);
+            BigDecimal usablevolume = wholevolume.multiply(BigDecimal.valueOf(efficiency));
+            BigDecimal ballvolume = BigDecimal.valueOf(4).divide(BigDecimal.valueOf(3), 10,
+                    RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(Math.PI)).multiply(
+                    BigDecimal.valueOf(Math.pow(radius, 3))).divide(BigDecimal.valueOf(1), 10,
+                    RoundingMode.HALF_UP).divide
+                    (measurementscale, 10, RoundingMode.HALF_UP);
+            value = usablevolume.divide(ballvolume, 10, RoundingMode.HALF_UP).doubleValue();
+            //this.balls = Math.floor(usablevolume/ballvolume);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return (int) Math.floor(value);
+    }
+
     public void recalculateBalls() {
-        this.balls.set(BallroomCalc.estimateBalls(
+        this.balls.set(estimateBalls(
                 this.isEasy.get() ? EASY_EFFICIENCY : this.efficiency.get(),
                 this.area.get(), this.depth.get(),
                 this.isEasy.get() ?
