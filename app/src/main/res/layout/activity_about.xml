@@ -17,6 +17,7 @@
         android:layout_height="0dp"
         android:layout_gravity="center_horizontal"
         android:layout_weight="2.08"
+        android:contentDescription="@string/logoDescription"
         android:src="@drawable/ic_launcher" />
 
     <TextView
@@ -34,18 +35,18 @@
         android:layout_gravity="center"
         android:text = "@string/versionstr"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="@string/title_nightmode" />
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center"-->
+    <!--android:text="@string/title_nightmode" />-->
 
-    <android.support.v7.widget.AppCompatSpinner
-        android:id="@+id/spinner_nightmode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginBottom="30sp" />
+    <!--<android.support.v7.widget.AppCompatSpinner-->
+    <!--android:id="@+id/spinner_nightmode"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center"-->
+    <!--android:layout_marginBottom="30sp" />-->
 
 
 </LinearLayout>

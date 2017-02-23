@@ -87,6 +87,7 @@ public class activity_main extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
         //applyNightMode();
         ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         if (savedInstanceState == null){
