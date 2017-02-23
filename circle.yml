@@ -15,7 +15,6 @@ machine:
 dependencies:
     pre:
         - wget "https://services.gradle.org/distributions/gradle-2.13-bin.zip"; unzip gradle-2.13-bin.zip
-        - source environmentSetup.sh && copyEnvVarsToGradleProperties
     override:
         - echo y | android update sdk --no-ui --all --filter tools,platform-tools,build-tools-25.0.2,android-25,extra-google-m2repository,extra-google-google_play_services,extra-android-m2repository
         - chmod +x gradlew
@@ -24,8 +23,9 @@ dependencies:
 test:
     override:
         # start the build
-        - (./gradlew assemble):
+        - (./gradlew assemble -PdisablePreDex):
             timeout: 360
+        - cp -r ${HOME}/${CIRCLE_PROJECT_REPONAME}/app/build/outputs/apk/ $CIRCLE_ARTIFACTS
         # start the emulator
         - emulator -avd circleci-android24 -no-audio -no-window:
             background: true
@@ -36,7 +36,7 @@ test:
         - sleep 30
         - adb shell input keyevent 82
         # run tests  against the emulator.
-        - ./gradlew connectedDevelopmentDebugAndroidTest jacocoTestReport coveralls -PdisablePreDex
+        - ./gradlew connectedDevelopmentDebugAndroidTest -PdisablePreDex
         # copy the build outputs to artifacts
         - cp -r app/build/outputs $CIRCLE_ARTIFACTS
         # copy the test results to the test results directory.
