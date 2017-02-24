@@ -27,10 +27,10 @@ android:
     - extra-android-support
     #- addon-google_apis-google-${ANDROID_API_LEVEL}
     - sys-img-${PLATFORM}-google_apis-${ANDROID_API_LEVEL}
-#licenses:
-#    - 'android-sdk-preview-.+'
-#    - 'android-sdk-license-.+'
-#    - 'google-gdk-license-.+'
+licenses:
+   - 'android-sdk-preview-.+'
+   - 'android-sdk-license-.+'
+   - 'google-gdk-license-.+'
 before_script:
   - echo no | android create avd --force -n test -t ${ANDROID_TARGET} --abi ${ANDROID_ABI} --tag ${ANDROID_TAG}
   - emulator -avd test -no-window &
