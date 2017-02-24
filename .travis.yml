@@ -9,7 +9,7 @@ env:
     - ANDROID_TAG=google_apis
   matrix:
     - ANDROID_TARGET=android-25 ANDROID_ABI=armeabi-v7a ANDROID_API_LEVEL=25
-    - ANDROID_TARGET=android-25 ANDROID_ABI=x86_65 ANDROID_API_LEVEL=25
+    - ANDROID_TARGET=android-25 ANDROID_ABI=x86_64 ANDROID_API_LEVEL=25
 android:
   components:
     # Uncomment the lines below if you want to
