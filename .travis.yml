@@ -9,7 +9,8 @@ env:
     - ANDROID_TAG=google_apis
   matrix:
     - ANDROID_TARGET=android-24 PLATFORM=armeabi-v7a ANDROID_ABI=google_apis/armeabi-v7a ANDROID_API_LEVEL=24
-    - ANDROID_TARGET=android-24 PLATFORM=x86_64 ANDROID_ABI=google_apis/x86_64 ANDROID_API_LEVEL=24
+    - ANDROID_TARGET=android-19 PLATFORM=armeabi-v7a ANDROID_ABI=google_apis/armeabi-v7a ANDROID_API_LEVEL=19
+    #- ANDROID_TARGET=android-24 PLATFORM=x86_64 ANDROID_ABI=google_apis/x86_64 ANDROID_API_LEVEL=24
 android:
   components:
     # Uncomment the lines below if you want to
@@ -32,7 +33,7 @@ android:
 #    - 'google-gdk-license-.+'
 before_script:
   - echo no | android create avd --force -n test -t ${ANDROID_TARGET} --abi ${ANDROID_ABI} --tag ${ANDROID_TAG}
-  - emulator -avd test -no-skin -no-audio -no-window &
+  - emulator -avd test -no-window &
   - android-wait-for-emulator
   - sleep 10
   - adb shell svc power stayon true
