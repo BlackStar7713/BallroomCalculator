@@ -34,7 +34,6 @@ licenses:
 before_script:
   - mkdir "$ANDROID_HOME/licenses"
   - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
-  - ./gradlew check &
   - echo no | android create avd --force -n test -t ${ANDROID_TARGET} --abi ${ANDROID_ABI} --tag ${ANDROID_TAG}
   - emulator -avd test -no-window &
   - android-wait-for-emulator
@@ -43,7 +42,7 @@ before_script:
   - sleep 5
   - adb shell input keyevent 82
 script:
-  - ./gradlew build jacocoTestReport assembleAndroidTest
+  - ./gradlew build
   - adb shell setprop dalvik.vm.dexopt-flags v=n,o=v
   - ./gradlew connectedCheck
   - ./gradlew jacocoTestReport
