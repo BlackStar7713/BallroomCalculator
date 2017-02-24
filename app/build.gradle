@@ -1,8 +1,11 @@
 buildscript {
 
 }
+plugins {
+    id 'jacoco'
+    id 'com.github.kt3k.coveralls' version '2.6.3'
+}
 apply plugin: 'com.android.application'
-apply plugin: 'jacoco'
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -24,7 +27,7 @@ android {
                     'proguard-rules.pro'
         }
         debug {
-            testCoverageEnabled = true
+            testCoverageEnabled true
             pseudoLocalesEnabled true
         }
     }
@@ -46,6 +49,10 @@ android {
             sourceCompatibility JavaVersion.VERSION_1_7
             targetCompatibility JavaVersion.VERSION_1_7
         }
+    }
+    dexOptions {
+        // Skip pre-dexing when running on Travis CI or when disabled via -Dpre-dex=false.
+        preDexLibraries = preDexEnabled && !travisBuild
     }
 }
 
@@ -77,10 +84,27 @@ dependencies {
 task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
     reports {
         xml.enabled = true
+        xml.destination "${buildDir}/reports/jacoco/report.xml"
         html.enabled = true
+        csv.enabled = true
     }
 
-    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*']
+    def fileFilter = [
+            '**/R.class',
+            '**/R$*.class',
+            '**/BuildConfig.*',
+            '**/Manifest*.*',
+            '**/*Test*.*',
+            'android/**/*.*',
+            '**/*$ViewInjector*.*',
+            '**/*$ViewBinder*.*',
+            '**/*MembersInjector*.*',
+            '**/*$Lambda$*.class',
+            '**/*Factory*.class',
+            '**/*$Builder*',
+            '**/*$Parcelable*.*',
+            '**/*DaggerApplicationComponent*.class',
+            '**/api']
     def debugTree = fileTree(dir: "${buildDir}/intermediates/classes/debug", excludes: fileFilter)
     def mainSrc = "${project.projectDir}/src/main/java"
 
