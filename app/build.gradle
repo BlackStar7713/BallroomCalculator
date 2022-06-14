@@ -70,9 +70,10 @@ android {
     testOptions {
         testOptions {
             unitTests.all {
-                jacoco {
-                    includeNoLocationClasses = true
-                }
+                //commented out as this prevents gradle sync from building tasks
+                // jacoco {
+                //     includeNoLocationClasses = true
+                // }
 
                 jvmArgs "-Xmx2g"
 
