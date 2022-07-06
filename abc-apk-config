@@ -9,3 +9,7 @@ make_test_runner = com.vibbix.ballroom.test/android.support.test.runner.AndroidJ
 make_espresso_coverage_file_path = app/build/outputs/code_coverage/debugAndroidTest/connected/*coverage.ec
 make_permissions =
 make_instr_skip_classes = com.vibbix.ballroom.R
+make_trace_multiple_threads = false
+make_carving_filter_methods = 
+make_instr_filter_packages = 
+make_instr_filter_classes = 
